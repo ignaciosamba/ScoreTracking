@@ -1,25 +1,19 @@
-package com.example.scoretracking.screen.favoritesScreen
+package com.example.scoretracking.screen.favoritesScreens
 
-import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
-import com.example.scoretracking.model.LeaguesModel
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.leagues.LeagueRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoriteScreenViewModel @Inject constructor(
+class FavoriteLeaguesScreenViewModel @Inject constructor(
     private val repository: LeagueRepository
 ) : ViewModel() {
 

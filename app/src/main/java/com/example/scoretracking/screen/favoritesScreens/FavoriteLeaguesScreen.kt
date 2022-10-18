@@ -1,6 +1,5 @@
-package com.example.scoretracking.screen.favoritesScreen
+package com.example.scoretracking.screen.favoritesScreens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,22 +12,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.LeagueFavorite
+import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.BottomNavApp
 import com.example.scoretracking.widgets.LeagueItem
-import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
 fun FavoritesSelection(
     navController: NavController,
-    favoriteScreenViewModel: FavoriteScreenViewModel
+    favoriteScreenViewModel: FavoriteLeaguesScreenViewModel
 ) {
     val leagueList = favoriteScreenViewModel.listLeague.collectAsState().value
     val favoritesLeagues = favoriteScreenViewModel.favoriteleagueList.collectAsState().value
@@ -50,8 +45,7 @@ fun FavoritesSelection(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         description = "Search"
                     ) {
-                        Toast.makeText(context, "GO Click", Toast.LENGTH_SHORT)
-                            .show()
+                        navController.navigate(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
                 }
             )
@@ -94,7 +88,7 @@ fun FavoritesSelection(
 @Composable
 fun CompileLeagueList (leagues : List<Country>,
                        favorites : Set<String>,
-                       favoriteScreenViewModel: FavoriteScreenViewModel) {
+                       favoriteScreenViewModel: FavoriteLeaguesScreenViewModel) {
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = leagues) { item  ->
             item.isFavorite = favorites.contains(item.idLeague)

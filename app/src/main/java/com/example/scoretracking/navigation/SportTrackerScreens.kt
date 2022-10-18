@@ -2,6 +2,7 @@ package com.example.scoretracking.navigation
 
 enum class SportTrackerScreens {
     SplashScreen,
-    SelectFavoritesScreen,
+    SelectFavoritesLeaguesScreen,
+    SelectFavoritesTeamsScreen,
     MainSceen
 }

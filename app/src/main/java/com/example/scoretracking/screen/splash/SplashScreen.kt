@@ -1,6 +1,5 @@
 package com.example.scoretracking.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.screen.splash.SplashScreenViewModel
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun SportTrackerSplashScreen (
@@ -24,7 +22,7 @@ fun SportTrackerSplashScreen (
 
     LaunchedEffect(key1 = leagueList.isNotEmpty()) {
 //            if (leagueList.isNotEmpty()) {
-                navController.navigate(SportTrackerScreens.SelectFavoritesScreen.name) {
+                navController.navigate(SportTrackerScreens.SelectFavoritesLeaguesScreen.name) {
                     popUpTo(SportTrackerScreens.SplashScreen.name) {
                         inclusive = true
                     }

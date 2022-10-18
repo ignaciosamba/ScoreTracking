@@ -1,20 +1,14 @@
 package com.example.scoretracking.navigation
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.scoretracking.model.Country
 import com.example.scoretracking.screen.SportTrackerSplashScreen
-import com.example.scoretracking.screen.favoritesScreen.FavoriteScreenViewModel
-import com.example.scoretracking.screen.favoritesScreen.FavoritesSelection
+import com.example.scoretracking.screen.favoritesScreens.FavoriteLeaguesScreenViewModel
+import com.example.scoretracking.screen.favoritesScreens.FavoritesSelection
+import com.example.scoretracking.screen.favoritesScreens.FavoritesTeamsSelection
 import com.example.scoretracking.screen.splash.SplashScreenViewModel
 
 @Composable
@@ -28,9 +22,13 @@ fun SportTrackerNavigation() {
                 SportTrackerSplashScreen(navController, splashScreenViewModel)
             }
         }
-        composable(SportTrackerScreens.SelectFavoritesScreen.name) { navBack ->
-            val favoriteScreenViewModel  = hiltViewModel<FavoriteScreenViewModel>()
+        composable(SportTrackerScreens.SelectFavoritesLeaguesScreen.name) { navBack ->
+            val favoriteScreenViewModel  = hiltViewModel<FavoriteLeaguesScreenViewModel>()
             FavoritesSelection(navController, favoriteScreenViewModel)
+        }
+        composable(SportTrackerScreens.SelectFavoritesTeamsScreen.name) {
+            val favoriteScreenViewModel  = hiltViewModel<FavoriteLeaguesScreenViewModel>()
+            FavoritesTeamsSelection(navController/*, favoriteScreenViewModel*/)
         }
     }
 }
