@@ -8,11 +8,11 @@ abstract class BaseDataSourse {
 
     protected suspend fun <T> getResults (call : suspend () -> Response<T>) : Resource<T> {
         try {
-            Log.d("SAMBA", "CALLING getResults")
+            Log.d("SAMBA66", "CALLING getResults")
             val response = call()
             if (response.isSuccessful) {
                 val body = response.body()
-                if (body != null) return Resource.Success(body) else Log.d("SAMBA", "CALLING getResults ERROR")
+                if (body != null) return Resource.Success(body) else Log.d("SAMBA66", "CALLING getResults ERROR")
 
             }
             return error("${response.code()} ${response.message()}")

@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.example.scoretracking.data.TheSportDataBase
 import com.example.scoretracking.data.dao.FavoriteLeagesDAO
+import com.example.scoretracking.data.dao.FavoriteTeamsDAO
 import com.example.scoretracking.data.dao.LeagueDAO
+import com.example.scoretracking.data.dao.TeamsDAO
 import com.example.scoretracking.network.SPORT_API_BASE_URL
 import com.example.scoretracking.network.TheSportDBApi
-import com.example.scoretracking.repository.leagues.LeaguesRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -51,4 +51,14 @@ class AppModule {
     @Provides
     fun provideFavoriteLeagueDao(theSportDataBase: TheSportDataBase) : FavoriteLeagesDAO =
         theSportDataBase.favoriteLeaguesDao()
+
+    @Singleton
+    @Provides
+    fun provideTeamDao(theSportDataBase: TheSportDataBase) : TeamsDAO =
+        theSportDataBase.teamsDao()
+
+    @Singleton
+    @Provides
+    fun provideFavoriteTeamDao(theSportDataBase: TheSportDataBase) : FavoriteTeamsDAO =
+        theSportDataBase.favoriteTeamsDao()
 }

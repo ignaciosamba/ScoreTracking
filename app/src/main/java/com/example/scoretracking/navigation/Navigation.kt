@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scoretracking.screen.SportTrackerSplashScreen
 import com.example.scoretracking.screen.favoritesScreens.FavoriteLeaguesScreenViewModel
+import com.example.scoretracking.screen.favoritesScreens.FavoriteTeamsScreenViewModel
 import com.example.scoretracking.screen.favoritesScreens.FavoritesSelection
 import com.example.scoretracking.screen.favoritesScreens.FavoritesTeamsSelection
 import com.example.scoretracking.screen.splash.SplashScreenViewModel
@@ -27,8 +28,8 @@ fun SportTrackerNavigation() {
             FavoritesSelection(navController, favoriteScreenViewModel)
         }
         composable(SportTrackerScreens.SelectFavoritesTeamsScreen.name) {
-            val favoriteScreenViewModel  = hiltViewModel<FavoriteLeaguesScreenViewModel>()
-            FavoritesTeamsSelection(navController/*, favoriteScreenViewModel*/)
+            val favoriteTeamsViewModel  = hiltViewModel<FavoriteTeamsScreenViewModel>()
+            FavoritesTeamsSelection(navController, favoriteTeamsViewModel)
         }
     }
 }

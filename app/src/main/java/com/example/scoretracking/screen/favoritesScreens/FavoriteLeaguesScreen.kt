@@ -1,5 +1,6 @@
 package com.example.scoretracking.screen.favoritesScreens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +46,7 @@ fun FavoritesSelection(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         description = "Search"
                     ) {
+                        Log.d("SAMBA77", "Click GO")
                         navController.navigate(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
                 }

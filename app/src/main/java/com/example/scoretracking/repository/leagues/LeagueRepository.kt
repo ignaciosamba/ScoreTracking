@@ -3,17 +3,15 @@ package com.example.scoretracking.repository.leagues
 import android.util.Log
 import com.example.scoretracking.data.dao.FavoriteLeagesDAO
 import com.example.scoretracking.data.dao.LeagueDAO
-import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
-import com.example.scoretracking.model.LeaguesModel
 import com.example.scoretracking.network.performGetResources
-import com.example.scoretracking.repository.Resource
+import com.example.scoretracking.repository.RemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
 class LeagueRepository @Inject constructor(
-    private val leaguesRemoteDataSource: LeaguesRemoteDataSource,
+    private val leaguesRemoteDataSource: RemoteDataSource,
     private val leagueLocalDataSource : LeagueDAO,
     private val favoriteLeaguesLocalDataSource : FavoriteLeagesDAO
 ) {
@@ -21,6 +19,7 @@ class LeagueRepository @Inject constructor(
                 databaseQuery = { leagueLocalDataSource.getAllLeaguesBySport(sportType).distinctUntilChanged() },
                 networkCall =  { leaguesRemoteDataSource.getLeaguesBySport(sportType) },
                 saveCallResult = { leagueLocalDataSource.instertAll(it.countries)})
+
 
     fun getFavoritesLeaguesBySport(league: String) : Flow<List<LeagueFavorite>> {
         return favoriteLeaguesLocalDataSource.getAllFavoriteLeaguesBySport(league).distinctUntilChanged()

@@ -1,5 +1,6 @@
 package com.example.scoretracking.screen.favoritesScreens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.Country
@@ -29,6 +30,7 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO){
             repository.getFavoritesLeaguesBySport(sportType).combine(repository.getLeaguesBySport(sportType)) {
                 favoriteListe, leagueListe ->
+                Log.d("SAMBA66", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
                 checkIfLeagueIsFavorite(favoriteListe, leagueListe)
             }.collect()
         }

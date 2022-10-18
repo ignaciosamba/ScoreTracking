@@ -25,6 +25,7 @@ import coil.compose.rememberImagePainter
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
+import com.example.scoretracking.model.Team
 
 
 @Composable
@@ -50,6 +51,43 @@ fun LeagueItem(league : Country,
             Spacer(modifier = Modifier.weight(1f))
             val density = LocalDensity.current
             AnimatedVisibility(visible = league.isFavorite,
+                enter = fadeIn(initialAlpha = 0.5f),
+                exit = fadeOut()) {
+                Box(modifier = Modifier.padding(8.dp)) {
+                    Image(painter = painterResource(id = R.drawable.ic_star_favorite),
+                        contentDescription = "favorite icon")
+                }
+            }
+        }
+        Divider(startIndent = 8.dp, thickness = 1.dp, color = Color.Black)
+    }
+
+}
+
+
+@Composable
+fun TeamItem(team: Team ,
+               onClickAction: () -> Unit) {
+
+    Row(horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            onClickAction.invoke()
+        }) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(painter = rememberImagePainter(team.strTeamBadge),
+                contentDescription = "League logo",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .height(70.dp)
+                    .width(70.dp))
+            Column (modifier = Modifier.padding(end = 50.dp)){
+                Text(text = team.strTeam.toString(), style = MaterialTheme.typography.subtitle1, fontSize = 15.sp)
+                Text(text = team.strCountry.toString())
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            val density = LocalDensity.current
+            AnimatedVisibility(visible = team.isFavorite,
                 enter = fadeIn(initialAlpha = 0.5f),
                 exit = fadeOut()) {
                 Box(modifier = Modifier.padding(8.dp)) {

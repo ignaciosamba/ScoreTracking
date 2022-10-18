@@ -1,15 +1,17 @@
-package com.example.scoretracking.repository.leagues
+package com.example.scoretracking.repository
 
-import android.util.Log
 import com.example.scoretracking.network.BaseDataSourse
 import com.example.scoretracking.network.TheSportDBApi
 import javax.inject.Inject
 
-class LeaguesRemoteDataSource @Inject constructor(
+class RemoteDataSource @Inject constructor(
     private val sportDBApi: TheSportDBApi) : BaseDataSourse(){
 
     suspend fun getLeaguesBySport(sportType : String) = getResults {
-        Log.d("SAMBA1", "CALLING getLeaguesBySporttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
         sportDBApi.getLeaguesBySport(sportType)
+    }
+
+    suspend fun getTeamsByLeagueId(leagueId : String) = getResults {
+        sportDBApi.getTeamsByLeagueId(leagueId)
     }
 }
