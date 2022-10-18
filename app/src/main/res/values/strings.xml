@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Score Tracking</string>
+
+    <string name="go_action_icon">Go</string>
+</resources>
