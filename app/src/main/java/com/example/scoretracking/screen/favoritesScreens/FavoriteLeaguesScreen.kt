@@ -44,9 +44,8 @@ fun FavoritesSelection(
                     // GO icon
                     TopAppBarActionButton(
                         imageVector = Icons.Default.KeyboardArrowRight,
-                        description = "Search"
+                        description = "GoToFavoriteTeams"
                     ) {
-                        Log.d("SAMBA77", "Click GO")
                         navController.navigate(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
                 }

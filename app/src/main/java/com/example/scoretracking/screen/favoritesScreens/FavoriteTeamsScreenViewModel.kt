@@ -1,6 +1,7 @@
 package com.example.scoretracking.screen.favoritesScreens
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.Country
@@ -32,15 +33,27 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     private var _favoriteTeamList = MutableStateFlow<List<TeamsFavorite>>(emptyList())
     val favoriteTeamList = _favoriteTeamList.asStateFlow()
 
+    // This list is for all the favorite leagues by sport
+    private var _favoriteleagueList = MutableStateFlow<List<LeagueFavorite>>(emptyList())
+    val favoriteleagueList = _favoriteleagueList.asStateFlow()
+
     init {
-        getTeamsByLeague()
+        getFavoriteLeagues()
     }
 
-    fun getTeamsByLeague(/*leagueId : String*/) {
+    fun getFavoriteLeagues() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getFavoriteLeagues().collect() {
+                _favoriteleagueList.value = it
+            }
+        }
+    }
+
+    fun getTeamsByLeague(leagueId : String) {
         Log.d("SAMBA77", "getTeamsByLeague 1")
         viewModelScope.launch(Dispatchers.IO){
             viewModelScope.launch(Dispatchers.IO){
-                repository.getFavoritesTeamsBySport("4328").combine(repository.getTeamsByLeagueId("4328")) {
+                repository.getFavoritesTeams().combine(repository.getTeamsByLeagueId(leagueId)) {
                         favoriteListe, leagueListe ->
                     Log.d("SAMBA66", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
                     checkIfLeagueIsFavorite(favoriteListe, leagueListe)
@@ -52,7 +65,7 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     fun saveTeamClickedAsFavorite(team : Team) {
         val favoriteTeam = TeamsFavorite(
             idTeam = team.idTeam,
-            strTeamLogo = team.strTeamLogo.toString(),
+            strTeamLogo = team.strTeamBadge.toString(),
             strLeague = team.strLeague.toString(),
             strTeam = team.strTeam.toString())
         viewModelScope.launch(Dispatchers.IO) {

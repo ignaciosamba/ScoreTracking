@@ -3,6 +3,7 @@ package com.example.scoretracking.repository.leagues
 import android.util.Log
 import com.example.scoretracking.data.dao.FavoriteLeagesDAO
 import com.example.scoretracking.data.dao.LeagueDAO
+import com.example.scoretracking.data.dao.TeamsDAO
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.network.performGetResources
 import com.example.scoretracking.repository.RemoteDataSource
@@ -13,7 +14,8 @@ import javax.inject.Inject
 class LeagueRepository @Inject constructor(
     private val leaguesRemoteDataSource: RemoteDataSource,
     private val leagueLocalDataSource : LeagueDAO,
-    private val favoriteLeaguesLocalDataSource : FavoriteLeagesDAO
+    private val favoriteLeaguesLocalDataSource : FavoriteLeagesDAO,
+    private val teamsLocalDataSource : TeamsDAO,
 ) {
     fun getLeaguesBySport(sportType : String) = performGetResources (
                 databaseQuery = { leagueLocalDataSource.getAllLeaguesBySport(sportType).distinctUntilChanged() },
@@ -34,5 +36,10 @@ class LeagueRepository @Inject constructor(
             favoriteLeaguesLocalDataSource.deleteFavoriteLeague(league)
         }
     }
+
+    fun saveTeamsByLeagueIntoFavoritesDB (leagueId : String) = performGetResources (
+        databaseQuery = { teamsLocalDataSource.getAllTeamsByLeagueId(leagueId).distinctUntilChanged() },
+        networkCall =  { leaguesRemoteDataSource.getTeamsByLeagueId(leagueId) },
+        saveCallResult = { teamsLocalDataSource.instertAll(it.teams)})
 
 }

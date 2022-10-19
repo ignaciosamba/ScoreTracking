@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FavoriteLeagesDAO {
 
+    @Query("SELECT * FROM favoritesLeagues")
+    fun getAllFavoriteLeagues() : Flow<List<LeagueFavorite>>
+
     @Query("SELECT * FROM favoritesLeagues WHERE strSport =:strSport")
     fun getAllFavoriteLeaguesBySport(strSport : String) : Flow<List<LeagueFavorite>>
 

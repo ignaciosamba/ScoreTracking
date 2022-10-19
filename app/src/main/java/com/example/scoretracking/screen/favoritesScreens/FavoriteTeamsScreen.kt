@@ -18,11 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.Team
-import com.example.scoretracking.widgets.BottomNavApp
-import com.example.scoretracking.widgets.LeagueItem
-import com.example.scoretracking.widgets.TeamItem
+import com.example.scoretracking.model.LeagueFavorite
+import com.example.scoretracking.widgets.LeagueClicableItem
 
 
 @Composable
@@ -30,18 +27,18 @@ fun FavoritesTeamsSelection(
     navController: NavController,
     favoriteTeamsScreenViewModel: FavoriteTeamsScreenViewModel
 ) {
-
+    Log.d("SAMBA333", "ENTRANDO AL FAVORITOS TEAMS")
     val teamsList = favoriteTeamsScreenViewModel.teamsByLeague.collectAsState().value
+    val favoriteLeagues = favoriteTeamsScreenViewModel.favoriteleagueList.collectAsState().value
     val favoritesTeams = favoriteTeamsScreenViewModel.favoriteTeamList.collectAsState().value
 
     val context = LocalContext.current
-
     Scaffold(modifier = Modifier
         .fillMaxHeight()
         .fillMaxWidth(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Select your favorite leagues") },
+                title = { Text(text = "Select your favorite teams") },
                 actions = {
                     // GO icon
                     TopAppBarActionButton(
@@ -56,19 +53,17 @@ fun FavoritesTeamsSelection(
     ) {
         Column(
             Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (teamsList.isNotEmpty()) {
+            if (favoriteLeagues.isNotEmpty()) {
+                Log.d("SAMBA22", "FAVORITE TEAMS: ${favoritesTeams.size}")
                 val favoriteSet = mutableSetOf<String>()
                 favoritesTeams.forEach {
+                    Log.d("SAMBA22", "ADDING TO SET: ${it.strTeam} ${it.idTeam}")
                     favoriteSet.add(it.idTeam)
                 }
-                CompileLeagueList(teamsList, favoriteSet, favoriteTeamsScreenViewModel)
-                teamsList.forEach {
-                    Log.d("SAMBA77", "FOR")
-                    it.strTeam?.let { it1 -> Text(text = it1) }
-                }
+                CompileLeagueList(favoriteLeagues, favoriteSet, favoriteTeamsScreenViewModel)
             } else {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -78,26 +73,22 @@ fun FavoritesTeamsSelection(
                         .height(150.dp)
                 ) {
                     CircularProgressIndicator()
-//                    if (sportType == "Soccer") {
-//                        favoriteScreenViewModel.loadLeaguesBySport("Soccer")
-//                    }
                 }
             }
         }
-        }
+    }
 }
 
 
 @Composable
-fun CompileLeagueList (leagues : List<Team>,
+fun CompileLeagueList (leagues : List<LeagueFavorite>,
                        favorites : Set<String>,
                        favoriteScreenViewModel: FavoriteTeamsScreenViewModel) {
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = leagues) { item  ->
-            item.isFavorite = favorites.contains(item.idLeague)
-            TeamItem(item) {
-                favoriteScreenViewModel.saveTeamClickedAsFavorite(item)
-//                favoriteScreenViewModel.saveLeagueClickedAsFavorite(item)
+            LeagueClicableItem(item, favorites, favoriteScreenViewModel) { team ->
+                Log.d("SAMBA88", "pressed $team.")
+                favoriteScreenViewModel.saveTeamClickedAsFavorite(team)
             }
         }
     }

@@ -13,6 +13,8 @@ fun<T,A> performGetResources(databaseQuery : () -> Flow<T>,
                              networkCall : suspend () -> Resource<A>,
                              saveCallResult : suspend (A) -> Unit) : Flow<Resource<T>> =
     flow {
+        Log.d("SAMBA66", "FLOOOOOOOOOOOOOOOOOOOOOOOOOOOW")
+
         emit(Resource.Loading(true))
         val source : Flow<Resource<T>> =  databaseQuery.invoke().map {
             if (it != null) {

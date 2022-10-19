@@ -30,7 +30,6 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO){
             repository.getFavoritesLeaguesBySport(sportType).combine(repository.getLeaguesBySport(sportType)) {
                 favoriteListe, leagueListe ->
-                Log.d("SAMBA66", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
                 checkIfLeagueIsFavorite(favoriteListe, leagueListe)
             }.collect()
         }
@@ -43,6 +42,7 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
             strLeague = league.strLeague.toString(),
             strSport = league.strSport.toString())
         viewModelScope.launch(Dispatchers.IO) {
+            repository.saveTeamsByLeagueIntoFavoritesDB(league.idLeague).collect()
             repository.saveLeagueIntoFavoritesDB(favoriteLeague, !league.isFavorite)
         }
     }
