@@ -13,10 +13,7 @@ import com.example.scoretracking.repository.leagues.LeagueRepository
 import com.example.scoretracking.repository.teams.TeamsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,6 +34,8 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     private var _favoriteleagueList = MutableStateFlow<List<LeagueFavorite>>(emptyList())
     val favoriteleagueList = _favoriteleagueList.asStateFlow()
 
+    var leagueSelectedFromView = ""
+
     init {
         getFavoriteLeagues()
     }
@@ -50,15 +49,12 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     }
 
     fun getTeamsByLeague(leagueId : String) {
-        Log.d("SAMBA77", "getTeamsByLeague 1")
+        leagueSelectedFromView = leagueId
         viewModelScope.launch(Dispatchers.IO){
-            viewModelScope.launch(Dispatchers.IO){
-                repository.getFavoritesTeams().combine(repository.getTeamsByLeagueId(leagueId)) {
-                        favoriteListe, leagueListe ->
-                    Log.d("SAMBA66", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
-                    checkIfLeagueIsFavorite(favoriteListe, leagueListe)
-                }.collect()
-            }
+            repository.getFavoritesTeams().combine(repository.getTeamsByLeagueId(leagueId)) {
+                    favoriteListe, teamListe ->
+                checkIfLeagueIsFavorite(favoriteListe, teamListe)
+            }.collect()
         }
     }
 
@@ -73,11 +69,18 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
         }
     }
 
-    private fun checkIfLeagueIsFavorite(favorites : List<TeamsFavorite>, teams :  Resource<List<Team>>) {
+    private fun checkIfLeagueIsFavorite(favorites : List<TeamsFavorite>,
+                                        teams : Resource<List<Team>>) {
         when (teams) {
             is Resource.Success -> {
-                _favoriteTeamList.value = favorites
-                _teamsByLeague.value = teams.value
+                // This if it's a workaround for the auto trigger from Room and Flow.
+                // avoids the 2nd update(trigger).
+                if (!teams.value.isNullOrEmpty() &&
+                    teams.value[0].idLeague == leagueSelectedFromView) {
+                    Log.d("SAMBA", "TESTING CLICK 2")
+                    _favoriteTeamList.value = favorites
+                    _teamsByLeague.value = teams.value
+                }
             }
         }
     }

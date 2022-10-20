@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TeamsDAO {
-//    @Query("SELECT * FROM teams")
-//    fun getAllTeams() : Flow<List<Team>>
 
     @Query("SELECT * FROM teams WHERE idLeague =:idLeague")
     fun getAllTeamsByLeagueId(idLeague : String) : Flow<List<Team>>

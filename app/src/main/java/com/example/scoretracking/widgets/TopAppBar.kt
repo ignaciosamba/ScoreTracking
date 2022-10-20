@@ -10,4 +10,5 @@ sealed class MenuAction(
     @DrawableRes val icon: Int) {
 
     object go : MenuAction(R.string.go_action_icon, R.drawable.ic_arrow_left)
+    object search : MenuAction(R.string.search_action_icon, R.drawable.ic_search)
 }

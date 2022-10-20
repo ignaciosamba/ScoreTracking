@@ -29,10 +29,8 @@ class LeagueRepository @Inject constructor(
 
     suspend fun saveLeagueIntoFavoritesDB (league : LeagueFavorite, isFavorite : Boolean) {
         if (isFavorite) {
-            Log.d("SAMBA22", "INSERT VALUE WITH $isFavorite")
             favoriteLeaguesLocalDataSource.insertFavoriteLeague(league)
         } else {
-            Log.d("SAMBA22", "DELETE VALUE WITH $isFavorite")
             favoriteLeaguesLocalDataSource.deleteFavoriteLeague(league)
         }
     }

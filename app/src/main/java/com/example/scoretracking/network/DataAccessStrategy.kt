@@ -13,8 +13,6 @@ fun<T,A> performGetResources(databaseQuery : () -> Flow<T>,
                              networkCall : suspend () -> Resource<A>,
                              saveCallResult : suspend (A) -> Unit) : Flow<Resource<T>> =
     flow {
-        Log.d("SAMBA66", "FLOOOOOOOOOOOOOOOOOOOOOOOOOOOW")
-
         emit(Resource.Loading(true))
         val source : Flow<Resource<T>> =  databaseQuery.invoke().map {
             if (it != null) {
@@ -23,16 +21,13 @@ fun<T,A> performGetResources(databaseQuery : () -> Flow<T>,
                 Resource.Loading(true)
             }
         }.distinctUntilChanged()
-        Log.d("SAMBA66", "EMITING source :  ${source.first()}")
         emit(source.first())
 
         val responseStatus = networkCall.invoke()
         when(responseStatus) {
             is Resource.Success -> {
-                Log.d("SAMBA66", "CALLING SAVERESULTS WITH: ${responseStatus.value}")
                 saveCallResult(responseStatus.value)
                 emit(source.first())
-                Log.d("SAMBA77", "EMITING SAVE CALLING SAVERESULTS")
             }
             is Resource.Error -> {
                 emit(Resource.Error("Error in the networkcall with ${responseStatus}"))

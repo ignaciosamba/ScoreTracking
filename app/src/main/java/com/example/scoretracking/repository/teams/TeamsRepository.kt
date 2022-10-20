@@ -10,6 +10,7 @@ import com.example.scoretracking.network.performGetResources
 import com.example.scoretracking.repository.RemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import javax.inject.Inject
 
 class TeamsRepository  @Inject constructor(
@@ -30,15 +31,13 @@ class TeamsRepository  @Inject constructor(
 
     suspend fun saveLeagueIntoFavoritesDB (team : TeamsFavorite, isFavorite : Boolean) {
         if (isFavorite) {
-            Log.d("SAMBA22", "INSERT VALUE WITH $isFavorite")
             leagueFavoriteLocalDataSource.insertFavoriteTeam(team)
         } else {
-            Log.d("SAMBA22", "DELETE VALUE WITH $isFavorite")
             leagueFavoriteLocalDataSource.deleteFavoriteTeam(team)
         }
     }
 
-    suspend fun getFavoriteLeagues() : Flow<List<LeagueFavorite>>{
+    fun getFavoriteLeagues() : Flow<List<LeagueFavorite>>{
         return leagueFavoriteLeagueDataSource.getAllFavoriteLeagues().distinctUntilChanged()
     }
 

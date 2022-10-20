@@ -4,6 +4,7 @@ import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,8 +35,12 @@ import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.model.Team
 import com.example.scoretracking.screen.favoritesScreens.FavoriteTeamsScreenViewModel
+import kotlinx.coroutines.flow.conflate
 
 
+/*
+ * League's widget for favorites.
+ */
 @Composable
 fun LeagueItem(league : Country,
                 onClickAction: () -> Unit) {
@@ -52,15 +57,18 @@ fun LeagueItem(league : Country,
                     .padding(8.dp)
                     .height(70.dp)
                     .width(70.dp))
-            Column (modifier = Modifier.padding(end = 50.dp)){
-                Text(text = league.strLeague.toString(), style = MaterialTheme.typography.subtitle1, fontSize = 15.sp)
+            Column (modifier = Modifier.padding(end = 20.dp)){
+                Text(text = league.strLeague.toString(),
+                    style = MaterialTheme.typography.subtitle1,
+                    fontSize = 15.sp,)
                 Text(text = league.strCountry.toString())
             }
             Spacer(modifier = Modifier.weight(1f))
             val density = LocalDensity.current
             AnimatedVisibility(visible = league.isFavorite,
-                enter = fadeIn(initialAlpha = 0.5f),
-                exit = fadeOut()) {
+                enter = fadeIn(animationSpec = tween(10),
+                                initialAlpha = 0.5f),
+                exit = fadeOut(animationSpec = tween(10))) {
                 Box(modifier = Modifier.padding(8.dp)) {
                     Image(painter = painterResource(id = R.drawable.ic_star_favorite),
                         contentDescription = "favorite icon")
@@ -73,16 +81,21 @@ fun LeagueItem(league : Country,
 }
 
 
+/*
+ * League's widget for teams favorites.
+ */
 @Composable
 fun LeagueClicableItem(league : LeagueFavorite,
                        favoriteSet : Set<String>,
                         favoriteTeamsViewModel : FavoriteTeamsScreenViewModel,
                         onClickAction: (Team) -> Unit) {
 
-    var teamsOfLeague = favoriteTeamsViewModel.teamsByLeague.collectAsState().value
+    var teamsOfLeague = favoriteTeamsViewModel.teamsByLeague.collectAsState(null).value
+    // This is used for the teams lists.
     var isClicked = remember {
         mutableStateOf(false)
     }
+    // This is used only for the icons.
     var isClickedForIcon = remember {
         mutableStateOf(false)
     }
@@ -93,55 +106,77 @@ fun LeagueClicableItem(league : LeagueFavorite,
             .padding(bottom = 8.dp, top = 5.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable {
+                Log.d("SAMBA", "TESTING CLICK")
                 isClicked.value = !isClicked.value
-                Log.d("SAMBA444", "onClick ${league.strLeague} with: ${isClicked.value}")
                 teamsOfLeague = emptyList()
-                favoriteTeamsViewModel.getTeamsByLeague(league.idLeague)
+                if (isClicked.value) {
+                    Log.d("SAMBA", "TESTING CLICK 2")
+                    favoriteTeamsViewModel.getTeamsByLeague(league.idLeague)
+                }else
+                    isClickedForIcon.value = false
+                Log.d("SAMBA", "TESTING CLICK 3")
             }) {
             Column (modifier = Modifier.padding(end = 5.dp, start = 20.dp)){
-                Text(text = league.strLeague, style = MaterialTheme.typography.subtitle1, fontSize = 22.sp)
+                Text(text = league.strLeague,
+                    style = MaterialTheme.typography.subtitle1,
+                    fontSize = 22.sp)
             }
             Spacer(modifier = Modifier.weight(1f))
-            Icon(imageVector = if(isClickedForIcon.value) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "arrow to open",
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(48.dp)
-                    .padding(end = 15.dp))
+
+            Crossfade(targetState = isClickedForIcon.value,
+                    animationSpec = tween(100)
+            ) { isChecked ->
+                Icon(imageVector = if(isChecked) Icons.Default.KeyboardArrowUp
+                                    else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "arrow to open",
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(48.dp)
+                        .padding(end = 15.dp))
+            }
+
         }
     }
 
-    teamsOfLeague.forEach { team ->
+    teamsOfLeague?.forEach { team ->
         if (team.idLeague == league.idLeague && isClicked.value) {
-            Log.d("SAMBA444", "TRUE : ${league.strLeague} WITH ${team.strTeam}")
             isClickedForIcon.value = true
             team.isFavorite = favoriteSet.contains(team.idTeam)
             TeamItem(team, isClicked.value) {
-                Log.d("SAMBA445", "ONCLICK TEAM : ${league.strLeague}")
                 teamSelected = it
                 onClickAction.invoke(teamSelected)
             }
         } else {
-            Log.d("SAMBA444", "FALSE : ${league.strLeague} WITH ${team.strTeam}")
             isClickedForIcon.value = false
+            /*
+            *TODO here I write this line because sometimes when the user clicks
+            * in one team the DB updates and triggers the flow with the last
+            * league clicked before the one of the team tha was being clicked.
+            */
+            isClicked.value = false
         }
     }
+    //TODO if the league has no team, we need to show some error message.
+//    if (teamsOfLeague != null && isClicked.value) {
+//        Row(horizontalArrangement = Arrangement.Center,
+//            verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier.padding(start = 45.dp)) {
+//            Text(text = "There are no teams in this league.")
+//        }
+//    }
 
     Divider(modifier = Modifier.padding(start = 20.dp, end = 20.dp),
         thickness = 1.dp,
         color = Color.Black)
 }
 
-
+/*
+ * Team's widget for favorites.
+ */
 @Composable
 fun TeamItem(team: Team ,
             isClicked : Boolean,
             onClickAction: (Team) -> Unit) {
-    Log.d("SAMBA22", "THE : ${team.strTeam} WITH ${team.idTeam}")
-    /*AnimatedVisibility(visible = isClicked,
-        enter = fadeIn(initialAlpha = 0.5f),
-        exit = fadeOut()) {*/
-        Log.d("SAMBA88", "UNA COSA ${team.strTeam}")
         Row(horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -158,7 +193,7 @@ fun TeamItem(team: Team ,
                         .height(45.dp)
                         .width(45.dp)
                 )
-                Column(modifier = Modifier.padding(end = 50.dp)) {
+                Column(modifier = Modifier.padding(end = 20.dp)) {
                     Text(
                         text = team.strTeam.toString(),
                         style = MaterialTheme.typography.subtitle1,
@@ -183,6 +218,5 @@ fun TeamItem(team: Team ,
             }
             Divider(startIndent = 8.dp, thickness = 1.dp, color = Color.Black)
         }
-//    }
 }
 

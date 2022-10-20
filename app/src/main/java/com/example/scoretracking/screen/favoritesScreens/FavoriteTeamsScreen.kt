@@ -27,8 +27,6 @@ fun FavoritesTeamsSelection(
     navController: NavController,
     favoriteTeamsScreenViewModel: FavoriteTeamsScreenViewModel
 ) {
-    Log.d("SAMBA333", "ENTRANDO AL FAVORITOS TEAMS")
-    val teamsList = favoriteTeamsScreenViewModel.teamsByLeague.collectAsState().value
     val favoriteLeagues = favoriteTeamsScreenViewModel.favoriteleagueList.collectAsState().value
     val favoritesTeams = favoriteTeamsScreenViewModel.favoriteTeamList.collectAsState().value
 
@@ -57,10 +55,8 @@ fun FavoritesTeamsSelection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (favoriteLeagues.isNotEmpty()) {
-                Log.d("SAMBA22", "FAVORITE TEAMS: ${favoritesTeams.size}")
                 val favoriteSet = mutableSetOf<String>()
                 favoritesTeams.forEach {
-                    Log.d("SAMBA22", "ADDING TO SET: ${it.strTeam} ${it.idTeam}")
                     favoriteSet.add(it.idTeam)
                 }
                 CompileLeagueList(favoriteLeagues, favoriteSet, favoriteTeamsScreenViewModel)
@@ -87,7 +83,6 @@ fun CompileLeagueList (leagues : List<LeagueFavorite>,
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = leagues) { item  ->
             LeagueClicableItem(item, favorites, favoriteScreenViewModel) { team ->
-                Log.d("SAMBA88", "pressed $team.")
                 favoriteScreenViewModel.saveTeamClickedAsFavorite(team)
             }
         }
