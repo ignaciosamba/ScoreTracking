@@ -1,15 +1,10 @@
 package com.example.scoretracking.widgets
 
-import android.service.autofill.OnClickAction
-import android.util.Log
 import androidx.compose.animation.*
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -24,8 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +28,6 @@ import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.model.Team
 import com.example.scoretracking.screen.favoritesScreens.FavoriteTeamsScreenViewModel
-import kotlinx.coroutines.flow.conflate
 
 
 /*
@@ -64,7 +56,6 @@ fun LeagueItem(league : Country,
                 Text(text = league.strCountry.toString())
             }
             Spacer(modifier = Modifier.weight(1f))
-            val density = LocalDensity.current
             AnimatedVisibility(visible = league.isFavorite,
                 enter = fadeIn(animationSpec = tween(10),
                                 initialAlpha = 0.5f),
@@ -92,13 +83,18 @@ fun LeagueClicableItem(league : LeagueFavorite,
 
     var teamsOfLeague = favoriteTeamsViewModel.teamsByLeague.collectAsState(null).value
     // This is used for the teams lists.
-    var isClicked = remember {
+    val isClicked = remember {
         mutableStateOf(false)
     }
     // This is used only for the icons.
-    var isClickedForIcon = remember {
+    val isClickedForIcon = remember {
         mutableStateOf(false)
     }
+
+    val isLeagueWithoutTeams = remember{
+        mutableStateOf(false)
+    }
+
     var teamSelected : Team
     Row(horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.Top,
@@ -106,15 +102,13 @@ fun LeagueClicableItem(league : LeagueFavorite,
             .padding(bottom = 8.dp, top = 5.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable {
-                Log.d("SAMBA", "TESTING CLICK")
-                isClicked.value = !isClicked.value
                 teamsOfLeague = emptyList()
+                isClicked.value = !isClicked.value
                 if (isClicked.value) {
-                    Log.d("SAMBA", "TESTING CLICK 2")
                     favoriteTeamsViewModel.getTeamsByLeague(league.idLeague)
-                }else
+                } else {
                     isClickedForIcon.value = false
-                Log.d("SAMBA", "TESTING CLICK 3")
+                }
             }) {
             Column (modifier = Modifier.padding(end = 5.dp, start = 20.dp)){
                 Text(text = league.strLeague,
@@ -139,25 +133,26 @@ fun LeagueClicableItem(league : LeagueFavorite,
     }
 
     teamsOfLeague?.forEach { team ->
-        if (team.idLeague == league.idLeague && isClicked.value) {
-            isClickedForIcon.value = true
-            team.isFavorite = favoriteSet.contains(team.idTeam)
-            TeamItem(team, isClicked.value) {
-                teamSelected = it
-                onClickAction.invoke(teamSelected)
-            }
+        if(team.idLeague == "-99") {
+            isLeagueWithoutTeams.value = true
         } else {
-            isClickedForIcon.value = false
-            /*
-            *TODO here I write this line because sometimes when the user clicks
-            * in one team the DB updates and triggers the flow with the last
-            * league clicked before the one of the team tha was being clicked.
-            */
-            isClicked.value = false
+            isLeagueWithoutTeams.value = false
+            if (team.idLeague == league.idLeague && isClicked.value) {
+                isClickedForIcon.value = true
+                team.isFavorite = favoriteSet.contains(team.idTeam)
+                TeamItem(team) {
+                    teamSelected = it
+                    onClickAction.invoke(teamSelected)
+                }
+            } else {
+                isClickedForIcon.value = false
+                isClicked.value = false
+            }
         }
     }
+
     //TODO if the league has no team, we need to show some error message.
-//    if (teamsOfLeague != null && isClicked.value) {
+//    if (isLeagueWithoutTeams.value && isClicked.value) {
 //        Row(horizontalArrangement = Arrangement.Center,
 //            verticalAlignment = Alignment.CenterVertically,
 //            modifier = Modifier.padding(start = 45.dp)) {
@@ -174,15 +169,12 @@ fun LeagueClicableItem(league : LeagueFavorite,
  * Team's widget for favorites.
  */
 @Composable
-fun TeamItem(team: Team ,
-            isClicked : Boolean,
+fun TeamItem(team: Team,
             onClickAction: (Team) -> Unit) {
         Row(horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clickable {
-                    onClickAction.invoke(team)
-                }
+                .clickable { onClickAction.invoke(team) }
                 .padding(start = 25.dp, end = 25.dp, top = 5.dp, bottom = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
@@ -202,7 +194,6 @@ fun TeamItem(team: Team ,
                     Text(text = team.strCountry.toString())
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                val density = LocalDensity.current
                 AnimatedVisibility(
                     visible = team.isFavorite,
                     enter = fadeIn(initialAlpha = 0.5f),

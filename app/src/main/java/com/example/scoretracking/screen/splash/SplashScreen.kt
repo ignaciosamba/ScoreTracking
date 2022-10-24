@@ -20,13 +20,13 @@ fun SportTrackerSplashScreen (
 
     val leagueList = splashScreenViewModel.listLeague.collectAsState().value
 
-    LaunchedEffect(key1 = leagueList.isNotEmpty()) {
-//            if (leagueList.isNotEmpty()) {
+    LaunchedEffect(key1 = leagueList) {
+            if (leagueList.isNotEmpty()) {
                 navController.navigate(SportTrackerScreens.SelectFavoritesLeaguesScreen.name) {
                     popUpTo(SportTrackerScreens.SplashScreen.name) {
                         inclusive = true
                     }
-//                }
+                }
             }
     }
 

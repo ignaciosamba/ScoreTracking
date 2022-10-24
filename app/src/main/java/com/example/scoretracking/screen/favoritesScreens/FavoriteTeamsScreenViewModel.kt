@@ -1,15 +1,12 @@
 package com.example.scoretracking.screen.favoritesScreens
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.model.Team
 import com.example.scoretracking.model.TeamsFavorite
 import com.example.scoretracking.repository.Resource
-import com.example.scoretracking.repository.leagues.LeagueRepository
 import com.example.scoretracking.repository.teams.TeamsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +47,7 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
 
     fun getTeamsByLeague(leagueId : String) {
         leagueSelectedFromView = leagueId
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(){
             repository.getFavoritesTeams().combine(repository.getTeamsByLeagueId(leagueId)) {
                     favoriteListe, teamListe ->
                 checkIfLeagueIsFavorite(favoriteListe, teamListe)
@@ -75,13 +72,16 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
             is Resource.Success -> {
                 // This if it's a workaround for the auto trigger from Room and Flow.
                 // avoids the 2nd update(trigger).
-                if (!teams.value.isNullOrEmpty() &&
+                if (teams.value.isNotEmpty() &&
                     teams.value[0].idLeague == leagueSelectedFromView) {
-                    Log.d("SAMBA", "TESTING CLICK 2")
                     _favoriteTeamList.value = favorites
                     _teamsByLeague.value = teams.value
+                } else if (teams.value.isEmpty() && leagueSelectedFromView != "-99") {
+                    _favoriteTeamList.value = favorites
+                    _teamsByLeague.value = listOf(Team(idLeague = "-99"))
                 }
             }
+            else -> { Log.d("checkIfLeagueIsFavorite", "Error")}
         }
     }
 }

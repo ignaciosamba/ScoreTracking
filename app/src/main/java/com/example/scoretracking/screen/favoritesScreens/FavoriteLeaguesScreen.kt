@@ -1,11 +1,13 @@
 package com.example.scoretracking.screen.favoritesScreens
 
-import android.util.Log
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -13,31 +15,38 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.BottomNavApp
 import com.example.scoretracking.widgets.LeagueItem
+import kotlinx.coroutines.delay
+import java.util.*
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FavoritesSelection(
     navController: NavController,
     favoriteScreenViewModel: FavoriteLeaguesScreenViewModel
 ) {
     val leagueList = favoriteScreenViewModel.listLeague.collectAsState().value
-    val favoritesLeagues = favoriteScreenViewModel.favoriteleagueList.collectAsState().value
-    val context = LocalContext.current
 
-    var filterList = remember {
+    val filterList = remember {
         mutableStateOf(leagueList)
     }
 
@@ -51,6 +60,30 @@ fun FavoritesSelection(
 
     var text by rememberSaveable {
         mutableStateOf("")
+    }
+
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    // LaunchedEffect prevents endless focus request
+    LaunchedEffect(searchClicked) {
+        if (searchClicked) {
+            focusRequester.requestFocus()
+            delay(100) // Make sure you have delay here
+            keyboard?.show()
+        }
+    }
+
+    val activity = (LocalContext.current as? Activity)
+    BackHandler {
+        if (searchClicked) {
+            searchClicked = false
+            filterList.value = emptyList()
+            focusRequester.requestFocus()
+            keyboard?.hide()
+        } else {
+            activity?.finish()
+        }
     }
 
     Scaffold(modifier = Modifier
@@ -71,6 +104,8 @@ fun FavoritesSelection(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         description = "GoToFavoriteTeams"
                     ) {
+                        favoriteScreenViewModel.cleanLeaguesList()
+                        filterList.value = emptyList()
                         navController.navigate(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
                 }
@@ -82,10 +117,8 @@ fun FavoritesSelection(
                 favoriteScreenViewModel.loadLeaguesBySport(it)
             }
         }) {
-        Column(Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Row(verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Center) {
             if (searchClicked) {
                 Row(horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top,
@@ -93,33 +126,42 @@ fun FavoritesSelection(
                         .height(50.dp)
                         .background(colorResource(id = R.color.purple_500))
                         .fillMaxWidth()
+                        .padding(top = 5.dp)
                 ) {
                         Card(modifier = Modifier
                             .width(300.dp)
                             .height(40.dp),
-                            shape = CircleShape) {
-                            TextField(value = text,
+                            shape = CircleShape,
+                            backgroundColor = Color.White) {
+                            BasicTextField(value = text,
                                 onValueChange = {
                                     text = it
-                                    Log.d("SAMBA55", text)
-                                    filterList.value = leagueList.filter { league -> league.strLeague?.contains(text)!! }
-                                    Log.d("SAMBA55", "league ${filterList.value.size}")
+                                    filterList.value = leagueList.filter { league ->
+                                        league.strLeague?.lowercase(Locale.ROOT)
+                                            ?.contains(text.lowercase(Locale.ROOT))!!
+                                    }
                                 },
-                                modifier = Modifier.background(Color.White)
+                                modifier = Modifier
+                                    .background(Color.White)
+                                    .fillMaxWidth()
+                                    .padding(top = 5.dp, start = 15.dp)
+                                    .focusRequester(focusRequester),
+                                textStyle = TextStyle(fontSize = 20.sp),
+                                cursorBrush = SolidColor(Color.Transparent)
                             )
                         }
                 }
             }
             if (leagueList.isNotEmpty()) {
-                Log.d("SAMBA55", "league 22 ${filterList.value.size}")
                 val favoriteSet = mutableSetOf<String>()
-                favoritesLeagues.forEach {
+                favoriteScreenViewModel.favoriteleagueList.collectAsState().value.forEach {
                     favoriteSet.add(it.idLeague)
                 }
-                if (filterList.value.isNotEmpty())
+                if (filterList.value.isNotEmpty()) {
                     CompileLeagueList(filterList.value, favoriteSet, favoriteScreenViewModel)
-                else
+                } else {
                     CompileLeagueList(leagueList, favoriteSet, favoriteScreenViewModel)
+                }
             } else {
                 Row(
                     horizontalArrangement = Arrangement.Center,

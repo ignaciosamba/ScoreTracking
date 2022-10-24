@@ -26,12 +26,19 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
     private var _favoriteleagueList = MutableStateFlow<List<LeagueFavorite>>(emptyList())
     val favoriteleagueList = _favoriteleagueList.asStateFlow()
 
+    var leagueSelectedFromView = ""
+
+    fun cleanLeaguesList () {
+        _leagueList.value = emptyList()
+    }
+
     fun loadLeaguesBySport(sportType: String) {
-        viewModelScope.launch(Dispatchers.IO){
+        leagueSelectedFromView = sportType
+        viewModelScope.launch(){
             repository.getFavoritesLeaguesBySport(sportType).combine(repository.getLeaguesBySport(sportType)) {
                 favoriteListe, leagueListe ->
                 checkIfLeagueIsFavorite(favoriteListe, leagueListe)
-            }.collect()
+            }.distinctUntilChanged().collect()
         }
     }
 
@@ -51,8 +58,12 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
         when (leagues) {
             is Resource.Success -> {
                 _favoriteleagueList.value = favorites
-                _leagueList.value = leagues.value
+                if (leagues.value.isNotEmpty() &&
+                    leagues.value[0].strSport == leagueSelectedFromView) {
+                    _leagueList.value = leagues.value
+                }
             }
+            else -> { Log.d("checkIfLeagueIsFavorite", "error")}
         }
     }
 }

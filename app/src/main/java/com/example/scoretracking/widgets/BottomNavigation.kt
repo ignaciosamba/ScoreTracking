@@ -28,8 +28,7 @@ fun BottomNavApp(selected : String,
         BottomNavItem.Basketball,
         BottomNavItem.MotorSport
     )
-
-    BottomNavigation (
+    BottomNavigation(
         backgroundColor = colorResource(id = R.color.purple_700),
         contentColor = Color.Black){
             item.forEach {
