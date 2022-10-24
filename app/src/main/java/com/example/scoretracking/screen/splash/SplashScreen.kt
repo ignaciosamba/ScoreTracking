@@ -9,24 +9,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.screen.splash.SplashScreenViewModel
 
 @Composable
 fun SportTrackerSplashScreen (
-    navController: NavController,
-    splashScreenViewModel: SplashScreenViewModel) {
+    openAndPopUp: (String, String) -> Unit,
+    modifier: Modifier = Modifier,
+    splashScreenViewModel: SplashScreenViewModel = hiltViewModel()) {
 
     val leagueList = splashScreenViewModel.listLeague.collectAsState().value
 
     LaunchedEffect(key1 = leagueList) {
             if (leagueList.isNotEmpty()) {
-                navController.navigate(SportTrackerScreens.SelectFavoritesLeaguesScreen.name) {
-                    popUpTo(SportTrackerScreens.SplashScreen.name) {
-                        inclusive = true
-                    }
-                }
+                splashScreenViewModel.onAppStart(openAndPopUp)
             }
     }
 

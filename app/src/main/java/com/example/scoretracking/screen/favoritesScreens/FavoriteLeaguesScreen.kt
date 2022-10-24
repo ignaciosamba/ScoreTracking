@@ -1,6 +1,7 @@
 package com.example.scoretracking.screen.favoritesScreens
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -26,8 +29,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
@@ -41,8 +46,9 @@ import java.util.*
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FavoritesSelection(
-    navController: NavController,
-    favoriteScreenViewModel: FavoriteLeaguesScreenViewModel
+    openScreen: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    favoriteScreenViewModel: FavoriteLeaguesScreenViewModel = hiltViewModel()
 ) {
     val leagueList = favoriteScreenViewModel.listLeague.collectAsState().value
 
@@ -75,9 +81,11 @@ fun FavoritesSelection(
     }
 
     val activity = (LocalContext.current as? Activity)
+
     BackHandler {
         if (searchClicked) {
             searchClicked = false
+            text = ""
             filterList.value = emptyList()
             focusRequester.requestFocus()
             keyboard?.hide()
@@ -106,19 +114,22 @@ fun FavoritesSelection(
                     ) {
                         favoriteScreenViewModel.cleanLeaguesList()
                         filterList.value = emptyList()
-                        navController.navigate(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
+                        openScreen(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
                 }
             )
         },
         bottomBar = {
             BottomNavApp(sportType){
+                searchClicked = false
+                text = ""
+                filterList.value = emptyList()
                 sportType = it
                 favoriteScreenViewModel.loadLeaguesBySport(it)
             }
         }) {
-        Row(verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Center) {
+        Column(verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally) {
             if (searchClicked) {
                 Row(horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Top,
@@ -147,7 +158,9 @@ fun FavoritesSelection(
                                     .padding(top = 5.dp, start = 15.dp)
                                     .focusRequester(focusRequester),
                                 textStyle = TextStyle(fontSize = 20.sp),
-                                cursorBrush = SolidColor(Color.Transparent)
+                                cursorBrush = SolidColor(Color.Gray),
+                                keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search)
                             )
                         }
                 }

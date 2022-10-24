@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.Country
+import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.leagues.LeagueRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,5 +33,9 @@ class SplashScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onAppStart(openAndPopUp : (String, String) -> Unit) {
+        openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.SplashScreen.name)
     }
 }

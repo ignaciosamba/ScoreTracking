@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">Score Tracking</string>
 
+    <!--Login-->
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+
     <string name="go_action_icon">Go</string>
     <string name="search_action_icon">Search</string>
+
+
 
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.widgets.LeagueClicableItem
@@ -24,9 +25,9 @@ import com.example.scoretracking.widgets.LeagueClicableItem
 
 @Composable
 fun FavoritesTeamsSelection(
-    navController: NavController,
-    favoriteTeamsScreenViewModel: FavoriteTeamsScreenViewModel
-) {
+    openScreen: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    favoriteTeamsScreenViewModel: FavoriteTeamsScreenViewModel = hiltViewModel()) {
     val favoriteLeagues = favoriteTeamsScreenViewModel.favoriteleagueList.collectAsState().value
     val favoritesTeams = favoriteTeamsScreenViewModel.favoriteTeamList.collectAsState().value
 
