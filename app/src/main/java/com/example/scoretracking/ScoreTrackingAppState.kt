@@ -4,15 +4,29 @@ import android.content.res.Resources
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
+import com.example.scoretracking.commons.snackbar.SnackBarManager
+import com.example.scoretracking.commons.snackbar.SnackbarMessage.Companion.toMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 @Stable
 class ScoreTrackingAppState (
     val scaffoldState: ScaffoldState,
     val navController: NavHostController,
+    private val snackbarManager: SnackBarManager,
     private val resources: Resources,
     coroutineScope: CoroutineScope
 ) {
+
+    init {
+        coroutineScope.launch {
+            snackbarManager.snackbarMessages.filterNotNull().collect { snackbarMessage ->
+                val text = snackbarMessage.toMessage(resources)
+                scaffoldState.snackbarHostState.showSnackbar(text)
+            }
+        }
+    }
 
     fun popUp() {
         navController.popBackStack()

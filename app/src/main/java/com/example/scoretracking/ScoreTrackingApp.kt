@@ -15,15 +15,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.scoretracking.commons.snackbar.SnackBarManager
+import com.example.scoretracking.commons.snackbar.SnackbarMessage
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.screen.SportTrackerSplashScreen
 import com.example.scoretracking.screen.favoritesScreens.FavoritesSelection
 import com.example.scoretracking.screen.favoritesScreens.FavoritesTeamsSelection
+import com.example.scoretracking.screen.login.LoginScreen
+import com.example.scoretracking.screen.login.RegisterScreen
 import com.example.scoretracking.ui.theme.ScoreTrackingTheme
 import kotlinx.coroutines.CoroutineScope
 
@@ -35,7 +40,18 @@ fun ScoreTrackerApp() {
 
         val appState = rememberAppState()
         // A surface container using the 'background' color from the theme
-        Scaffold(scaffoldState = appState.scaffoldState) { innerPaddingModifier ->
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = it,
+                    modifier = Modifier.padding(8.dp),
+                    snackbar = { snackbarData ->
+                        Snackbar(snackbarData, contentColor = MaterialTheme.colors.onPrimary)
+                    }
+                )
+            },
+            scaffoldState = appState.scaffoldState
+        ) { innerPaddingModifier ->
             NavHost(
                 navController = appState.navController,
                 startDestination = SportTrackerScreens.SplashScreen.name,
@@ -50,10 +66,17 @@ fun ScoreTrackerApp() {
 fun rememberAppState(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     navController: NavHostController = rememberNavController(),
+    snackbarManager: SnackBarManager = SnackBarManager,
     resources: Resources = resources(),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) = remember(scaffoldState, navController, resources, coroutineScope) {
-    ScoreTrackingAppState(scaffoldState, navController, resources, coroutineScope)
+    ScoreTrackingAppState(
+        scaffoldState,
+        navController,
+        snackbarManager,
+        resources,
+        coroutineScope
+    )
 }
 
 @Composable
@@ -76,6 +99,17 @@ fun NavGraphBuilder.makeItSoGraph(appState: ScoreTrackingAppState) {
 
     composable(SportTrackerScreens.SelectFavoritesTeamsScreen.name) {
         FavoritesTeamsSelection(openScreen = { route -> appState.navigate(route) })
+    }
+
+    composable(SportTrackerScreens.LoginScreen.name) {
+        LoginScreen(
+            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+            openScreen = { route -> appState.navigate(route) }
+        )
+    }
+
+    composable(SportTrackerScreens.RegisterScreen.name) {
+        RegisterScreen( openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
     }
 //
 //    composable(

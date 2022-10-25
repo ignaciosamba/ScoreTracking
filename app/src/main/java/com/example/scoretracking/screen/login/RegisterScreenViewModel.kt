@@ -1,10 +1,13 @@
 package com.example.scoretracking.screen.login
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.commons.isValidEmail
+import com.example.scoretracking.commons.isValidPassword
+import com.example.scoretracking.commons.passwordMatches
 import com.example.scoretracking.commons.snackbar.SnackBarManager
-import com.example.scoretracking.model.LoginUiState
+import com.example.scoretracking.model.RegisterUiState
 import com.example.scoretracking.model.service.AccountInterface
 import com.example.scoretracking.model.service.LogInterface
 import com.example.scoretracking.navigation.SportTrackerScreens
@@ -14,17 +17,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.scoretracking.R.string as AppText
 
+
 @HiltViewModel
-class LoginScreenViewModel @Inject constructor(
+class RegisterScreenViewModel @Inject constructor(
     private val accountInt: AccountInterface,
     private val loginInt : LogInterface
-): LoginBasicViewModel(loginInt){
+) : LoginBasicViewModel(loginInt) {
 
-    var uiState = mutableStateOf(LoginUiState())
+    var uiState = mutableStateOf(RegisterUiState())
         private set
 
     private val email get() = uiState.value.email
     private val password get() = uiState.value.password
+    private val repeatPassword get() = uiState.value.repeatPassword
 
     fun onEmailChange(email : String) {
         uiState.value = uiState.value.copy(email = email)
@@ -34,46 +39,41 @@ class LoginScreenViewModel @Inject constructor(
         uiState.value = uiState.value.copy(password = password)
     }
 
-    fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
+    fun onPasswordRepeatChange(passwordRepeated : String) {
+        uiState.value = uiState.value.copy(repeatPassword = passwordRepeated)
+    }
+
+    fun onRegisterClicked(openAndPopUp: (String, String) -> Unit) {
         if (!email.isValidEmail()) {
             SnackBarManager.showMessage(AppText.email_error)
             return
         }
 
-        if (password.isBlank()) {
-            SnackBarManager.showMessage(AppText.empty_password_error)
+        if (!password.isValidPassword()) {
+            SnackBarManager.showMessage(AppText.password_error)
+            return
+        }
+
+        if (!password.passwordMatches(uiState.value.repeatPassword)) {
+            SnackBarManager.showMessage(AppText.password_match_error)
             return
         }
 
         viewModelScope.launch(showErrorExceptionHandler) {
-            accountInt.authenticate(email, password) { error ->
+//            val createAccountTrace = Firebase.performance.newTrace(CREATE_ACCOUNT_TRACE)
+//            createAccountTrace.start()
+            Log.d("SAMBA", "CREATING ACCOUNT WITH: $email and $password")
+            accountInt.registerNewAccoun(email, password) { error ->
+//                createAccountTrace.stop()
+
                 if (error == null) {
-                    openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.LoginScreen.name)
+                    Log.d("SAMBA", "NO ERROR")
+                    openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.RegisterScreen.name)
                 } else {
+                    Log.d("SAMBA", "ERROR: $error")
                     onError(error)
                 }
             }
         }
     }
-
-
-    fun onForgotPasswordClick() {
-        if (!email.isValidEmail()) {
-            SnackBarManager.showMessage(AppText.email_error)
-            return
-        }
-
-        viewModelScope.launch(showErrorExceptionHandler) {
-            accountInt.sendRecoveryEmail(email) { error ->
-                if (error != null) onError(error)
-                else SnackBarManager.showMessage(AppText.recovery_email_sent)
-            }
-        }
-    }
-
-    fun onCreateAccountClicked(openScreen: (String) -> Unit) {
-        openScreen(SportTrackerScreens.RegisterScreen.name)
-    }
-
-
 }

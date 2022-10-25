@@ -12,13 +12,13 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.scoretracking.model.LeagueFavorite
 import com.example.scoretracking.widgets.LeagueClicableItem
 
@@ -27,9 +27,16 @@ import com.example.scoretracking.widgets.LeagueClicableItem
 fun FavoritesTeamsSelection(
     openScreen: (String) -> Unit,
     modifier: Modifier = Modifier,
-    favoriteTeamsScreenViewModel: FavoriteTeamsScreenViewModel = hiltViewModel()) {
-    val favoriteLeagues = favoriteTeamsScreenViewModel.favoriteleagueList.collectAsState().value
-    val favoritesTeams = favoriteTeamsScreenViewModel.favoriteTeamList.collectAsState().value
+    viewModel : FavoriteTeamsScreenViewModel = hiltViewModel()) {
+
+    DisposableEffect(viewModel) {
+        viewModel.addListener()
+        onDispose { viewModel.removeListener() }
+    }
+
+    val favoriteLeagues = viewModel.favoriteleagueList.collectAsState().value
+    val favoritesTeams = viewModel.favoriteTeamList.collectAsState().value
+    val favoritesTeamsFromStorage = viewModel.favoriteTeamListFromStorage
 
     val context = LocalContext.current
     Scaffold(modifier = Modifier
@@ -57,10 +64,12 @@ fun FavoritesTeamsSelection(
         ) {
             if (favoriteLeagues.isNotEmpty()) {
                 val favoriteSet = mutableSetOf<String>()
-                favoritesTeams.forEach {
-                    favoriteSet.add(it.idTeam)
+                favoritesTeamsFromStorage.forEach {
+                    Log.d("SAMBA", "${it.value.idTeam}")
+                    favoriteSet.add(it.value.idTeam)
                 }
-                CompileLeagueList(favoriteLeagues, favoriteSet, favoriteTeamsScreenViewModel)
+                Log.d("SAMBA", "${favoriteSet}")
+                CompileLeagueList(favoriteLeagues, favoriteSet, viewModel)
             } else {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -80,11 +89,12 @@ fun FavoritesTeamsSelection(
 @Composable
 fun CompileLeagueList (leagues : List<LeagueFavorite>,
                        favorites : Set<String>,
-                       favoriteScreenViewModel: FavoriteTeamsScreenViewModel) {
+                       viewModel: FavoriteTeamsScreenViewModel) {
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = leagues) { item  ->
-            LeagueClicableItem(item, favorites, favoriteScreenViewModel) { team ->
-                favoriteScreenViewModel.saveTeamClickedAsFavorite(team)
+            LeagueClicableItem(item, favorites, viewModel) { team ->
+                viewModel.saveTeamClickedAsFavorite(team)
+                viewModel.teamClickedToStorage(team)
             }
         }
     }

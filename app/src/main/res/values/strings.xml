@@ -4,7 +4,21 @@
     <!--Login-->
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
+    <string name="login_repeat_password">Repeat password</string>
+    <string name="login">Log In</string>
+    <string name="login_register">CREATE ACCOUNT</string>
+    <string name="forgot_password">Forgot password? Get recovery email</string>
+    <string name="email_error">Insert a valid email</string>
+    <string name="empty_password_error">Password cannot be empty</string>
+    <string name="recovery_email_sent">Please verify your email account.</string>
 
+    <!--Register-->
+    <string name="register_text">Create Account</string>
+    <string name="password_error">Your password should have at least six digits and include one digit, one lower case letter and one upper case letter.</string>
+    <string name="password_match_error">Passwords do not match.</string>
+
+
+    <string name="generic_error">Oops! Somethings went wrong. Please try again later.</string>
     <string name="go_action_icon">Go</string>
     <string name="search_action_icon">Search</string>
 

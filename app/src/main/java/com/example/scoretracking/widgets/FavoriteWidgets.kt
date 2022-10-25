@@ -1,5 +1,6 @@
 package com.example.scoretracking.widgets
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -133,12 +134,14 @@ fun LeagueClicableItem(league : LeagueFavorite,
     }
 
     teamsOfLeague?.forEach { team ->
-        if(team.idLeague == "-99") {
-            isLeagueWithoutTeams.value = true
-        } else {
+//        if(team.idLeague == "-99") {
+//            isLeagueWithoutTeams.value = true
+//        } else {
             isLeagueWithoutTeams.value = false
             if (team.idLeague == league.idLeague && isClicked.value) {
+                Log.d("SAMBA", "IF")
                 isClickedForIcon.value = true
+                Log.d("SAMBA", "TEAM ${team.strTeam} IS FAVORITE: ${favoriteSet.contains(team.idTeam)}")
                 team.isFavorite = favoriteSet.contains(team.idTeam)
                 TeamItem(team) {
                     teamSelected = it
@@ -148,7 +151,7 @@ fun LeagueClicableItem(league : LeagueFavorite,
                 isClickedForIcon.value = false
                 isClicked.value = false
             }
-        }
+//        }
     }
 
     //TODO if the league has no team, we need to show some error message.

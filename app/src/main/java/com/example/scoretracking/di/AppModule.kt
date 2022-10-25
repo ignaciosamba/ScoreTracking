@@ -7,8 +7,10 @@ import com.example.scoretracking.data.dao.FavoriteLeagesDAO
 import com.example.scoretracking.data.dao.FavoriteTeamsDAO
 import com.example.scoretracking.data.dao.LeagueDAO
 import com.example.scoretracking.data.dao.TeamsDAO
+import com.example.scoretracking.model.service.AccountInterface
 import com.example.scoretracking.network.SPORT_API_BASE_URL
 import com.example.scoretracking.network.TheSportDBApi
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,4 +63,6 @@ class AppModule {
     @Provides
     fun provideFavoriteTeamDao(theSportDataBase: TheSportDataBase) : FavoriteTeamsDAO =
         theSportDataBase.favoriteTeamsDao()
+
+
 }

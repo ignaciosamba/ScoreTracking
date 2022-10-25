@@ -1,20 +1,60 @@
 package com.example.scoretracking.screen.login
 
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.scoretracking.commons.basicButton
+import com.example.scoretracking.commons.fieldModifier
+import com.example.scoretracking.commons.textButton
+import com.example.scoretracking.commons.textButtonEnd
+import com.example.scoretracking.widgets.BasicButton
+import com.example.scoretracking.widgets.BasicTextButton
+import com.example.scoretracking.widgets.EmailField
+import com.example.scoretracking.widgets.PasswordField
+import com.example.scoretracking.R.string as AppText
 
 @Composable
-fun LoginScreen(popUpScreen: () -> Unit,
+fun LoginScreen(openAndPopUp: (String, String) -> Unit,
+                openScreen: (String) -> Unit,
                 viewModel: LoginScreenViewModel = hiltViewModel()) {
 
     val uiState by viewModel.uiState
 
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
 
+        EmailField(uiState.email, viewModel::onEmailChange, Modifier.fieldModifier())
+        PasswordField(uiState.password, viewModel::onPasswordChange, Modifier.fieldModifier())
+
+        Row(horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.weight(1f))
+            BasicTextButton(AppText.forgot_password, Modifier.textButtonEnd(), 13.sp, Color.DarkGray) {
+                viewModel.onForgotPasswordClick()
+            }
+        }
+        BasicButton(AppText.login, Modifier.basicButton()) {
+            viewModel.onSignInClick(openAndPopUp)
+        }
+
+        BasicTextButton(AppText.login_register, Modifier.textButton(), 16.sp, MaterialTheme.colors.primary) {
+            viewModel.onCreateAccountClicked(openScreen)
+        }
+
+    }
 
 }
 

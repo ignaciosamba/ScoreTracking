@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.Country
+import com.example.scoretracking.model.service.AccountInterface
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.leagues.LeagueRepository
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashScreenViewModel @Inject constructor(
-    private val repository: LeagueRepository
+    private val repository: LeagueRepository,
+    private val account: AccountInterface,
 ) : ViewModel() {
 
     private val _leagueList = MutableStateFlow<List<Country>>(emptyList())
@@ -36,6 +38,16 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     fun onAppStart(openAndPopUp : (String, String) -> Unit) {
-        openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.SplashScreen.name)
+        if (account.hasUser()) {
+            openAndPopUp(
+                SportTrackerScreens.SelectFavoritesLeaguesScreen.name,
+                SportTrackerScreens.SplashScreen.name
+            )
+        }else {
+            openAndPopUp(
+                SportTrackerScreens.LoginScreen.name,
+                SportTrackerScreens.SplashScreen.name
+            )
+        }
     }
 }
