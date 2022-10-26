@@ -3,13 +3,13 @@ package com.example.scoretracking.model.service
 import com.example.scoretracking.model.StorageTeam
 
 interface StorageFavoriteTeamsInterface {
-    fun addListener(
+    fun addTeamsListener(
         userId: String,
         onDocumentEvent: (Boolean, StorageTeam) -> Unit,
         onError: (Throwable) -> Unit
     )
 
-    fun removeListener()
+    fun removeTeamsListener()
     fun getFavoriteTeam(teamId: String, onError: (Throwable) -> Unit, onSuccess: (StorageTeam) -> Unit)
     fun saveFavoriteTeam(team: StorageTeam, onResult: (Throwable?) -> Unit)
     fun updateFavoriteTeam(team: StorageTeam, onResult: (Throwable?) -> Unit)

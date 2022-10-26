@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.LeagueFavorite
+import com.example.scoretracking.model.StorageLeague
 import com.example.scoretracking.model.Team
 import com.example.scoretracking.screen.favoritesScreens.FavoriteTeamsScreenViewModel
 
@@ -77,7 +77,7 @@ fun LeagueItem(league : Country,
  * League's widget for teams favorites.
  */
 @Composable
-fun LeagueClicableItem(league : LeagueFavorite,
+fun LeagueClicableItem(league : StorageLeague,
                        favoriteSet : Set<String>,
                         favoriteTeamsViewModel : FavoriteTeamsScreenViewModel,
                         onClickAction: (Team) -> Unit) {
@@ -134,9 +134,6 @@ fun LeagueClicableItem(league : LeagueFavorite,
     }
 
     teamsOfLeague?.forEach { team ->
-//        if(team.idLeague == "-99") {
-//            isLeagueWithoutTeams.value = true
-//        } else {
             isLeagueWithoutTeams.value = false
             if (team.idLeague == league.idLeague && isClicked.value) {
                 Log.d("SAMBA", "IF")
@@ -151,17 +148,7 @@ fun LeagueClicableItem(league : LeagueFavorite,
                 isClickedForIcon.value = false
                 isClicked.value = false
             }
-//        }
     }
-
-    //TODO if the league has no team, we need to show some error message.
-//    if (isLeagueWithoutTeams.value && isClicked.value) {
-//        Row(horizontalArrangement = Arrangement.Center,
-//            verticalAlignment = Alignment.CenterVertically,
-//            modifier = Modifier.padding(start = 45.dp)) {
-//            Text(text = "There are no teams in this league.")
-//        }
-//    }
 
     Divider(modifier = Modifier.padding(start = 20.dp, end = 20.dp),
         thickness = 1.dp,

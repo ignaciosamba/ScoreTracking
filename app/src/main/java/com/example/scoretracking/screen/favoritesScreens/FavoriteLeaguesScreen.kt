@@ -1,7 +1,6 @@
 package com.example.scoretracking.screen.favoritesScreens
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -33,7 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.navigation.SportTrackerScreens
@@ -48,9 +46,15 @@ import java.util.*
 fun FavoritesSelection(
     openScreen: (String) -> Unit,
     modifier: Modifier = Modifier,
-    favoriteScreenViewModel: FavoriteLeaguesScreenViewModel = hiltViewModel()
+    viewModel: FavoriteLeaguesScreenViewModel = hiltViewModel()
 ) {
-    val leagueList = favoriteScreenViewModel.listLeague.collectAsState().value
+
+    DisposableEffect(viewModel) {
+        viewModel.addListener()
+        onDispose { viewModel.removeListener() }
+    }
+
+    val leagueList = viewModel.listLeague.collectAsState().value
 
     val filterList = remember {
         mutableStateOf(leagueList)
@@ -75,7 +79,7 @@ fun FavoritesSelection(
     LaunchedEffect(searchClicked) {
         if (searchClicked) {
             focusRequester.requestFocus()
-            delay(100) // Make sure you have delay here
+            delay(10) // Make sure you have delay here
             keyboard?.show()
         }
     }
@@ -112,7 +116,7 @@ fun FavoritesSelection(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         description = "GoToFavoriteTeams"
                     ) {
-                        favoriteScreenViewModel.cleanLeaguesList()
+                        viewModel.cleanLeaguesList()
                         filterList.value = emptyList()
                         openScreen(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
@@ -125,7 +129,7 @@ fun FavoritesSelection(
                 text = ""
                 filterList.value = emptyList()
                 sportType = it
-                favoriteScreenViewModel.loadLeaguesBySport(it)
+                viewModel.loadLeaguesBySport(it)
             }
         }) {
         Column(verticalArrangement = Arrangement.Top,
@@ -167,13 +171,13 @@ fun FavoritesSelection(
             }
             if (leagueList.isNotEmpty()) {
                 val favoriteSet = mutableSetOf<String>()
-                favoriteScreenViewModel.favoriteleagueList.collectAsState().value.forEach {
-                    favoriteSet.add(it.idLeague)
+                viewModel.favoriteLeagueListFromStorage.forEach {
+                    favoriteSet.add(it.value.idLeague)
                 }
                 if (filterList.value.isNotEmpty()) {
-                    CompileLeagueList(filterList.value, favoriteSet, favoriteScreenViewModel)
+                    CompileLeagueList(filterList.value, favoriteSet, viewModel)
                 } else {
-                    CompileLeagueList(leagueList, favoriteSet, favoriteScreenViewModel)
+                    CompileLeagueList(leagueList, favoriteSet, viewModel)
                 }
             } else {
                 Row(
@@ -185,7 +189,7 @@ fun FavoritesSelection(
                 ) {
                     CircularProgressIndicator()
                     if (sportType == "Soccer") {
-                        favoriteScreenViewModel.loadLeaguesBySport("Soccer")
+                        viewModel.loadLeaguesBySport("Soccer")
                     }
                 }
             }
@@ -196,7 +200,7 @@ fun FavoritesSelection(
 @Composable
 fun CompileLeagueList (leagues : List<Country>,
                        favorites : Set<String>,
-                       favoriteScreenViewModel: FavoriteLeaguesScreenViewModel) {
+                       viewModel: FavoriteLeaguesScreenViewModel) {
     val mutablelist = leagues.toMutableList()
     mutablelist.forEach {
         it.isFavorite = favorites.contains(it.idLeague)
@@ -204,7 +208,8 @@ fun CompileLeagueList (leagues : List<Country>,
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = mutablelist.sortedBy { !it.isFavorite }) { item  ->
             LeagueItem(item) {
-                favoriteScreenViewModel.saveLeagueClickedAsFavorite(item)
+//                viewModel.saveLeagueClickedAsFavorite(item)
+                viewModel.updateStorageAfterClick(item)
             }
         }
     }

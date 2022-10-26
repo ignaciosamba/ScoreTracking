@@ -17,5 +17,8 @@ abstract class AppModuleInterfaces {
     abstract fun provideLogService(impl: LogImpl): LogInterface
 
     @Binds
-    abstract fun provideStorageService(impl: StorageFavoriteTeamsImpl): StorageFavoriteTeamsInterface
+    abstract fun provideStorageTeamService(impl: StorageFavoriteImpl): StorageFavoriteTeamsInterface
+
+    @Binds
+    abstract fun provideStorageLeagueService(impl: StorageFavoriteImpl): StorageLeagueInterface
 }
