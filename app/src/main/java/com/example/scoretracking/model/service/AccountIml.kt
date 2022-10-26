@@ -9,14 +9,7 @@ import javax.inject.Inject
 class AccountIml @Inject constructor() : AccountInterface {
 
     override fun hasUser(): Boolean {
-        Log.d("SAMBA", "HAAAAAAAAAAAAAAAAAS")
-        var value = false
-        try {
-            value = Firebase.auth.currentUser != null
-        } catch (e : Exception) {
-            Log.d("SAMBA", "ERROR: ${e.stackTraceToString()}")
-        }
-        return value
+        return Firebase.auth.currentUser != null
     }
 
     override fun getUserId(): String {
@@ -36,7 +29,6 @@ class AccountIml @Inject constructor() : AccountInterface {
     override fun registerNewAccoun(email: String, password: String, onResult: (Throwable?) -> Unit) {
         Firebase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                Log.d("SAMBA", "${it.exception?.stackTraceToString()}")
                 onResult(it.exception)
             }
     }
@@ -46,7 +38,6 @@ class AccountIml @Inject constructor() : AccountInterface {
 
         Firebase.auth.currentUser!!.linkWithCredential(credential)
             .addOnCompleteListener {
-                Log.d("SAMBA", "${it.exception?.stackTraceToString()}")
                 onResult(it.exception)
             }
     }

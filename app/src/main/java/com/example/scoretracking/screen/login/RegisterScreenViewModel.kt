@@ -62,15 +62,11 @@ class RegisterScreenViewModel @Inject constructor(
         viewModelScope.launch(showErrorExceptionHandler) {
 //            val createAccountTrace = Firebase.performance.newTrace(CREATE_ACCOUNT_TRACE)
 //            createAccountTrace.start()
-            Log.d("SAMBA", "CREATING ACCOUNT WITH: $email and $password")
             accountInt.registerNewAccoun(email, password) { error ->
 //                createAccountTrace.stop()
-
                 if (error == null) {
-                    Log.d("SAMBA", "NO ERROR")
                     openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.RegisterScreen.name)
                 } else {
-                    Log.d("SAMBA", "ERROR: $error")
                     onError(error)
                 }
             }

@@ -1,6 +1,5 @@
 package com.example.scoretracking.widgets
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -13,10 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -79,10 +75,12 @@ fun LeagueItem(league : Country,
 @Composable
 fun LeagueClicableItem(league : StorageLeague,
                        favoriteSet : Set<String>,
-                        favoriteTeamsViewModel : FavoriteTeamsScreenViewModel,
-                        onClickAction: (Team) -> Unit) {
+                       viewModel : FavoriteTeamsScreenViewModel,
+                       onClickAction: (Team) -> Unit) {
+    var teamsOfLeague = remember {
+        viewModel.teamsByLeague
+    }
 
-    var teamsOfLeague = favoriteTeamsViewModel.teamsByLeague.collectAsState(null).value
     // This is used for the teams lists.
     val isClicked = remember {
         mutableStateOf(false)
@@ -103,10 +101,10 @@ fun LeagueClicableItem(league : StorageLeague,
             .padding(bottom = 8.dp, top = 5.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable {
-                teamsOfLeague = emptyList()
+                teamsOfLeague = mutableStateListOf()
                 isClicked.value = !isClicked.value
                 if (isClicked.value) {
-                    favoriteTeamsViewModel.getTeamsByLeague(league.idLeague)
+                    viewModel.getTeamsByLeague(league.idLeague)
                 } else {
                     isClickedForIcon.value = false
                 }
@@ -133,12 +131,10 @@ fun LeagueClicableItem(league : StorageLeague,
         }
     }
 
-    teamsOfLeague?.forEach { team ->
+    teamsOfLeague.forEach { team ->
             isLeagueWithoutTeams.value = false
             if (team.idLeague == league.idLeague && isClicked.value) {
-                Log.d("SAMBA", "IF")
                 isClickedForIcon.value = true
-                Log.d("SAMBA", "TEAM ${team.strTeam} IS FAVORITE: ${favoriteSet.contains(team.idTeam)}")
                 team.isFavorite = favoriteSet.contains(team.idTeam)
                 TeamItem(team) {
                     teamSelected = it

@@ -1,7 +1,9 @@
 package com.example.scoretracking.screen.favoritesScreens
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.model.*
 import com.example.scoretracking.model.service.AccountInterface
@@ -26,8 +28,8 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     private val accountService: AccountInterface,
 ) : LoginBasicViewModel(logService) {
 
-    private var _teamsByLeague = MutableStateFlow<List<Team>>(emptyList())
-    val teamsByLeague = _teamsByLeague.asStateFlow()
+    var teamsByLeague = mutableStateListOf<Team>()
+        private set
 
     // This list is for all the favorite teams by league
     var favoriteTeamListFromStorage = mutableStateMapOf<String, StorageTeam>()
@@ -52,15 +54,17 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
     }
 
     fun getTeamsByLeague(leagueId : String) {
-        viewModelScope.launch(){
-            repository.getTeamsByLeagueId(leagueId).collectLatest { response ->
+        viewModelScope.launch(showErrorExceptionHandler){
+            repository.getTeamsByLeagueId(leagueId).distinctUntilChanged().collectLatest { response ->
                 when (response) {
                     is Resource.Success -> {
                         // This if it's a workaround for the leagues without teams in it.
                         if (response.value.isNotEmpty()) {
-                            _teamsByLeague.value = response.value
+                            teamsByLeague.removeAll(teamsByLeague)
+                            teamsByLeague.addAll(response.value.toMutableStateList())
                         } else{
-                            _teamsByLeague.value = listOf(Team(idLeague = "-99"))
+                            teamsByLeague.removeAll(teamsByLeague)
+                            onError(Throwable("No teams found in this league."))
                         }
                     }
                     is Resource.Error -> {
