@@ -1,16 +1,12 @@
 package com.example.scoretracking
 
 import android.content.res.Resources
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -22,13 +18,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.scoretracking.commons.snackbar.SnackBarManager
-import com.example.scoretracking.commons.snackbar.SnackbarMessage
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.screen.SportTrackerSplashScreen
-import com.example.scoretracking.screen.favoritesScreens.FavoritesSelection
-import com.example.scoretracking.screen.favoritesScreens.FavoritesTeamsSelection
+import com.example.scoretracking.screen.favorites.FavoritesSelection
+import com.example.scoretracking.screen.favorites.FavoritesTeamsSelection
 import com.example.scoretracking.screen.login.LoginScreen
 import com.example.scoretracking.screen.login.RegisterScreen
+import com.example.scoretracking.screen.main.GamesScreen
 import com.example.scoretracking.ui.theme.ScoreTrackingTheme
 import kotlinx.coroutines.CoroutineScope
 
@@ -110,6 +106,10 @@ fun NavGraphBuilder.makeItSoGraph(appState: ScoreTrackingAppState) {
 
     composable(SportTrackerScreens.RegisterScreen.name) {
         RegisterScreen( openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+    }
+
+    composable(SportTrackerScreens.GamesScreen.name) {
+        GamesScreen(openScreen = { route -> appState.navigate(route) })
     }
 //
 //    composable(

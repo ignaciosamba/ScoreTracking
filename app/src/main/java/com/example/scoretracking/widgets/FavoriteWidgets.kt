@@ -24,7 +24,7 @@ import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.StorageLeague
 import com.example.scoretracking.model.Team
-import com.example.scoretracking.screen.favoritesScreens.FavoriteTeamsScreenViewModel
+import com.example.scoretracking.screen.favorites.FavoriteTeamsScreenViewModel
 
 
 /*

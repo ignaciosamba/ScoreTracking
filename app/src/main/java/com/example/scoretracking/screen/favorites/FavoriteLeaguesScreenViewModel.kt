@@ -1,4 +1,4 @@
-package com.example.scoretracking.screen.favoritesScreens
+package com.example.scoretracking.screen.favorites
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf

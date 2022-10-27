@@ -1,4 +1,4 @@
-package com.example.scoretracking.screen.favoritesScreens
+package com.example.scoretracking.screen.favorites
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scoretracking.model.StorageLeague
+import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.LeagueClicableItem
 
 
@@ -48,8 +49,7 @@ fun FavoritesTeamsSelection(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         description = "Search"
                     ) {
-                        Toast.makeText(context, "GO Click", Toast.LENGTH_SHORT)
-                            .show()
+                        openScreen(SportTrackerScreens.GamesScreen.name)
                     }
                 }
             ) }

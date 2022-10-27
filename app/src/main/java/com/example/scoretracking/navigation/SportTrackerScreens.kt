@@ -6,5 +6,6 @@ enum class SportTrackerScreens {
     RegisterScreen,
     SelectFavoritesLeaguesScreen,
     SelectFavoritesTeamsScreen,
+    GamesScreen,
     MainSceen
 }

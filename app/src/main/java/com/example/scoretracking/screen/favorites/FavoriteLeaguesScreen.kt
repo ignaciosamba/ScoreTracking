@@ -1,4 +1,4 @@
-package com.example.scoretracking.screen.favoritesScreens
+package com.example.scoretracking.screen.favorites
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
