@@ -57,3 +57,9 @@ fun getWeekPageTitle(week: Week): String {
         }
     }
 }
+
+fun getTimeZoneOffsetWithUTCInHours(): Long {
+    val tz = TimeZone.getDefault()
+    val now = Date()
+    return ((tz.getOffset(now.time) / 1000) / 3600).toLong()
+}

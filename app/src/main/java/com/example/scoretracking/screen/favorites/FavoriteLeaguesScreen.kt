@@ -35,7 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.navigation.SportTrackerScreens
-import com.example.scoretracking.widgets.BottomNavApp
+import com.example.scoretracking.widgets.BottomNavFavoritesApp
 import com.example.scoretracking.widgets.LeagueItem
 import kotlinx.coroutines.delay
 import java.util.*
@@ -120,11 +120,13 @@ fun FavoritesSelection(
                         filterList.value = emptyList()
                         openScreen(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
                     }
-                }
+                },
+                contentColor = Color.Black,
+                backgroundColor = Color.White
             )
         },
         bottomBar = {
-            BottomNavApp(sportType){
+            BottomNavFavoritesApp(sportType){
                 searchClicked = false
                 text = ""
                 filterList.value = emptyList()

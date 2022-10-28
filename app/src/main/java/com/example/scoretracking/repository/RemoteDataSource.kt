@@ -14,4 +14,8 @@ class RemoteDataSource @Inject constructor(
     suspend fun getTeamsByLeagueId(leagueId : String) = getResults {
         sportDBApi.getTeamsByLeagueId(leagueId)
     }
+
+    suspend fun getEventsByDate(date : String) = getResults {
+        sportDBApi.getEventsByDate(date)
+    }
 }

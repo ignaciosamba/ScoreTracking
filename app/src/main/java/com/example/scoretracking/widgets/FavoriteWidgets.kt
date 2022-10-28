@@ -16,11 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import com.example.scoretracking.R
+import com.example.scoretracking.R.color as AppColor
+import com.example.scoretracking.R.string as AppText
+import com.example.scoretracking.R.drawable as AppDrawable
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.StorageLeague
 import com.example.scoretracking.model.Team
@@ -58,7 +61,7 @@ fun LeagueItem(league : Country,
                                 initialAlpha = 0.5f),
                 exit = fadeOut(animationSpec = tween(10))) {
                 Box(modifier = Modifier.padding(8.dp)) {
-                    Image(painter = painterResource(id = R.drawable.ic_star_favorite),
+                    Image(painter = painterResource(id = AppDrawable.ic_star_favorite),
                         contentDescription = "favorite icon")
                 }
             }
@@ -145,10 +148,6 @@ fun LeagueClicableItem(league : StorageLeague,
                 isClicked.value = false
             }
     }
-
-    Divider(modifier = Modifier.padding(start = 20.dp, end = 20.dp),
-        thickness = 1.dp,
-        color = Color.Black)
 }
 
 /*
@@ -187,7 +186,7 @@ fun TeamItem(team: Team,
                 ) {
                     Box(modifier = Modifier.padding(8.dp)) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_star_favorite),
+                            painter = painterResource(id = AppDrawable.ic_star_favorite),
                             contentDescription = "favorite icon"
                         )
                     }

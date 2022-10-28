@@ -14,6 +14,9 @@ interface TeamsDAO {
     @Query("SELECT * FROM teams WHERE idLeague =:idLeague")
     fun getAllTeamsByLeagueId(idLeague : String) : Flow<List<Team>>
 
+    @Query("SELECT strTeamBadge FROM teams WHERE idTeam =:idTeam")
+    fun getTeamBadge(idTeam : String) : Flow<String>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun instertAll(teams : List<Team>)
 }
