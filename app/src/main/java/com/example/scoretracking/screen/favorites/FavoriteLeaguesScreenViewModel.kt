@@ -73,6 +73,7 @@ class FavoriteLeaguesScreenViewModel @Inject constructor(
         val storageLeague = StorageLeague(
             idLeague = league.idLeague,
             strLeagueAlternate = league.strLeagueAlternate.toString(),
+            strCurrentSeason = league.strCurrentSeason.toString(),
             strLeague = league.strLeague.toString(),
             strSport = league.strSport.toString(),
             userId = accountService.getUserId())

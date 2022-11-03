@@ -1,6 +1,5 @@
 package com.example.scoretracking.screen.favorites
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scoretracking.model.StorageLeague
 import com.example.scoretracking.navigation.SportTrackerScreens
-import com.example.scoretracking.widgets.LeagueClicableItem
+import com.example.scoretracking.widgets.LeagueFavoriteClicableItem
 
 
 @Composable
@@ -90,7 +89,7 @@ fun CompileLeagueList (leagues : List<StorageLeague>,
                        viewModel: FavoriteTeamsScreenViewModel) {
     LazyColumn(contentPadding = PaddingValues(4.dp)) {
         items(items = leagues) { item  ->
-            LeagueClicableItem(item, favorites, viewModel) { team ->
+            LeagueFavoriteClicableItem(item, favorites, viewModel) { team ->
                 viewModel.teamClickedToStorage(team)
             }
         }

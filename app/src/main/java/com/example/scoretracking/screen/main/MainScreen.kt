@@ -1,5 +1,6 @@
 package com.example.scoretracking.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -47,6 +48,8 @@ fun GamesScreen(
                 bottomNavSelected = it
             }
         }) { innerPadding ->
+
+        Log.d("SAMBA", "Selected: $bottomNavSelected")
         if(bottomNavSelected.equals("Games", ignoreCase = true)) {
             viewModel.getEventsByDate()
             GameScreen(
@@ -56,6 +59,9 @@ fun GamesScreen(
                 startDate = startDate,
                 endDate = endDate
             )
+        } else if (bottomNavSelected.equals("Standings", ignoreCase = true)) {
+            Log.d("SAMBA", "favoriteLeaguesFromStorage: ${viewModel.favoriteLeaguesFromStorage}")
+            StandingScreen(openScreen = openScreen, modifier = modifier, viewModel = viewModel)
         }
     }
 }

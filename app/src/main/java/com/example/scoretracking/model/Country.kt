@@ -29,8 +29,8 @@ data class Country(
 //    val strComplete: String?,
     @ColumnInfo(name = "strCountry")
     val strCountry: String?,
-//    @ColumnInfo(name = "strCurrentSeason")
-//    val strCurrentSeason: String?,
+    @ColumnInfo(name = "strCurrentSeason")
+    val strCurrentSeason: String?,
 //    @ColumnInfo(name = "strDescriptionEN")
 //    val strDescriptionEN: String?,
 //    @ColumnInfo(name = "strDescriptionES")

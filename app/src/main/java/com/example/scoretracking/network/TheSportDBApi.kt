@@ -24,4 +24,7 @@ interface TheSportDBApi {
     @GET("v1/json/$API_KEY/searchteams.php")
     suspend fun getTeamsByName(@Query("t") teamName : String?): Response<TeamsModel>
 
+    @GET("v1/json/$API_KEY/lookuptable.php")
+    suspend fun getStandingByLeague(@Query("l") leagueId: String?, @Query("s") season: String): Response<LeagueStandingModel>
+
 }

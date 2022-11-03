@@ -16,18 +16,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import com.example.scoretracking.R.color as AppColor
-import com.example.scoretracking.R.string as AppText
 import com.example.scoretracking.R.drawable as AppDrawable
 import com.example.scoretracking.model.Country
 import com.example.scoretracking.model.StorageLeague
 import com.example.scoretracking.model.Team
 import com.example.scoretracking.screen.favorites.FavoriteTeamsScreenViewModel
+import com.example.scoretracking.screen.main.MainScreenViewModel
 
 
 /*
@@ -76,10 +78,10 @@ fun LeagueItem(league : Country,
  * League's widget for teams favorites.
  */
 @Composable
-fun LeagueClicableItem(league : StorageLeague,
-                       favoriteSet : Set<String>,
-                       viewModel : FavoriteTeamsScreenViewModel,
-                       onClickAction: (Team) -> Unit) {
+fun LeagueFavoriteClicableItem(league : StorageLeague,
+                               favoriteSet : Set<String>,
+                               viewModel : FavoriteTeamsScreenViewModel,
+                               onClickAction: (Team) -> Unit) {
     var teamsOfLeague = remember {
         viewModel.teamsByLeague
     }
@@ -195,4 +197,167 @@ fun TeamItem(team: Team,
             Divider(startIndent = 8.dp, thickness = 1.dp, color = Color.Black)
         }
 }
+
+
+@Composable
+fun TeamStandingTableItem(position : String,
+                          teamName : String,
+                          teamBadge : String,
+                          teamGamesPlayed : String,
+                          teamDiff : String,
+                          teamPts : String) {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .padding(bottom = 5.dp, start = 20.dp, end = 20.dp)
+            .fillMaxWidth()
+            .height(40.dp)) {
+        Box(contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .width(40.dp)
+                .padding(3.dp)) {
+            Text(
+                text = position,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Spacer(modifier = Modifier.width(5.dp))
+        Box(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .height(30.dp)
+                .width(30.dp)
+                .padding(end = 8.dp)) {
+            Image(
+                painter = rememberImagePainter("$teamBadge"),
+                contentDescription = "League logo",
+                modifier = Modifier
+                    .padding(1.dp)
+                    .height(29.dp)
+                    .width(29.dp)
+            )
+        }
+        Box(contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .width(100.dp)) {
+            Text(
+                textAlign = TextAlign.Start,
+                text = teamName,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
+        }
+        Spacer(modifier = Modifier.width(40.dp))
+        Box(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .width(40.dp)) {
+            Text(
+                text = teamGamesPlayed,
+                fontStyle = FontStyle.Normal,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Spacer(modifier = Modifier.width(5.dp))
+        Box(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .width(40.dp)) {
+            Text(
+                text = teamDiff,
+                fontStyle = FontStyle.Normal,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Spacer(modifier = Modifier.width(5.dp))
+        Box(contentAlignment = Alignment.CenterEnd,
+            modifier = Modifier
+                .width(40.dp)) {
+            Text(
+                text = teamPts,
+                fontStyle = FontStyle.Normal,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Spacer(modifier = Modifier.width(5.dp))
+    }
+}
+
+
+/*
+* League's widget for teams favorites.
+*/
+//@Composable
+//fun LeagueClicableItem(league : StorageLeague,
+//                       viewModel : MainScreenViewModel
+//                       onClickAction: (Team) -> Unit) {
+//
+//    var teamsOfLeague = remember {
+//        viewModel.standings
+//    }
+//
+//    // This is used for the teams lists.
+//    val isClicked = remember {
+//        mutableStateOf(false)
+//    }
+//    // This is used only for the icons.
+//    val isClickedForIcon = remember {
+//        mutableStateOf(false)
+//    }
+//
+//
+//    var teamSelected : Team
+//    Row(horizontalArrangement = Arrangement.Center,
+//        verticalAlignment = Alignment.Top,
+//        modifier = Modifier
+//            .padding(bottom = 8.dp, top = 5.dp)) {
+//        Row(verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier.clickable {
+//                teamsOfLeague = mutableStateMapOf()
+//                isClicked.value = !isClicked.value
+//                if (isClicked.value) {
+//                    viewModel.getStandingByLeague(league.idLeague)
+//                } else {
+//                    isClickedForIcon.value = false
+//                }
+//            }) {
+//            Column (modifier = Modifier.padding(end = 5.dp, start = 20.dp)){
+//                Text(text = league.strLeague,
+//                    style = MaterialTheme.typography.subtitle1,
+//                    fontSize = 22.sp)
+//            }
+//            Spacer(modifier = Modifier.weight(1f))
+//
+//            Crossfade(targetState = isClickedForIcon.value,
+//                animationSpec = tween(100)
+//            ) { isChecked ->
+//                Icon(imageVector = if(isChecked) Icons.Default.KeyboardArrowUp
+//                else Icons.Default.KeyboardArrowDown,
+//                    contentDescription = "arrow to open",
+//                    modifier = Modifier
+//                        .height(48.dp)
+//                        .width(48.dp)
+//                        .padding(end = 15.dp))
+//            }
+//
+//        }
+//    }
+//
+//    teamsOfLeague.forEach { (key, team) ->
+//        if (key == league.idLeague && isClicked.value) {
+//            isClickedForIcon.value = true
+//            TeamItem(team) {
+//                teamSelected = it
+//                onClickAction.invoke(teamSelected)
+//            }
+//        } else {
+//            isClickedForIcon.value = false
+//            isClicked.value = false
+//        }
+//    }
+//}
 

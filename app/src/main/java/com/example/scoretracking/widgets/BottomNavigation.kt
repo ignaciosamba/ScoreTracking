@@ -24,7 +24,7 @@ sealed class BottomNavItem(var title : String, var icon : Int, var screen_route 
 
     //Main Screen
     object Games : BottomNavItem("Games", R.drawable.ic_games,"Games")
-    object Standings: BottomNavItem("Standings",R.drawable.ic_standings,"Standing")
+    object Standings: BottomNavItem("Standings",R.drawable.ic_standings,"Standings")
     object News: BottomNavItem("News",R.drawable.ic_news,"News")
 
 }
