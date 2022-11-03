@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter
 fun GameScreen(
     openScreen: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GameScreenViewModel = hiltViewModel(),
+    viewModel: MainScreenViewModel = hiltViewModel(),
     currentDate : LocalDate,
     startDate : LocalDate,
     endDate : LocalDate/*,
@@ -196,12 +196,11 @@ fun StickyGameLeague(league : String) {
 @Composable
 fun GameItem(
     event : Event,
-    viewModel : GameScreenViewModel,
+    viewModel : MainScreenViewModel,
     onClick: (String) ->  Unit) {
     if (event.strSport != "Motorsport" && event.strSport != "Fighting") {
         GameEventCard(event = event, viewModel = viewModel, onClick = onClick)
     } else {
-        Log.d("SAMBA2", "EVENT: ${event.strSport}")
         MotorSportEventCard(event = event, viewModel = viewModel, onClick = onClick)
     }
 }

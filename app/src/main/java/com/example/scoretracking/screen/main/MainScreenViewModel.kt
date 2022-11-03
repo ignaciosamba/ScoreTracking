@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.commons.getTimeZoneOffsetWithUTCInHours
 import com.example.scoretracking.model.Event
 import com.example.scoretracking.model.StorageLeague
+import com.example.scoretracking.model.StorageTeam
 import com.example.scoretracking.model.service.AccountInterface
 import com.example.scoretracking.model.service.LogInterface
+import com.example.scoretracking.model.service.StorageFavoriteTeamsInterface
 import com.example.scoretracking.model.service.StorageLeagueInterface
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.main.GamesRepository
@@ -21,10 +23,11 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
-class GameScreenViewModel @Inject constructor(
+class MainScreenViewModel @Inject constructor(
     private val repository: GamesRepository,
     logService: LogInterface,
     private val storageLeagueService: StorageLeagueInterface,
+    private val storageFavoriteTeamsInterface: StorageFavoriteTeamsInterface,
     private val accountService: AccountInterface
 ) : LoginBasicViewModel(logService) {
 
@@ -36,29 +39,31 @@ class GameScreenViewModel @Inject constructor(
         private set
     // This list is for all the favorite leagues
     private var favoriteLeaguesFromStorage = mutableStateMapOf<String, StorageLeague>()
+    // This list is for all the favorite leagues
+    private var favoriteTeamsFromStorage = mutableStateMapOf<String, StorageTeam>()
 
     var selectedDay = mutableStateOf<LocalDate>(LocalDate.now())
         private set
 
     init {
-        Log.d("SAMBA3", "LALALLALALALAL")
         getEventsByDate()
     }
 
     fun addListener() {
         viewModelScope.launch(showErrorExceptionHandler) {
             storageLeagueService.addLeagueListener(accountService.getUserId(), ::onDocumentLeagueEvent, ::onError)
+            storageFavoriteTeamsInterface.addTeamsListener(accountService.getUserId(), ::onDocumentTeamsEvent, ::onError)
         }
     }
 
     fun removeListener() {
         viewModelScope.launch(showErrorExceptionHandler) {
             storageLeagueService.removeLeagueListener()
+            storageFavoriteTeamsInterface.removeTeamsListener()
         }
     }
 
     fun getEventsByDate(date : LocalDate = LocalDate.now()) {
-        Log.d("SAMBA", "OFFSET: ${LocalTime.now()}")
         viewModelScope.launch(showErrorExceptionHandler) {
             repository.getEventsByDay(date.toString()).collect { response ->
                 when (response) {
@@ -67,11 +72,17 @@ class GameScreenViewModel @Inject constructor(
                             val eventList = response.value.events.filter { event ->
                                 idLeague == event.idLeague && event.dateEvent == date.toString()
                             }
-                            if (eventList.isNotEmpty()) events[league.strLeague] = eventList
+                            if (eventList.isNotEmpty()) events[league.strLeague] = eventList.sortedBy { it.strTimestamp }
+                        }
+                        favoriteTeamsFromStorage.forEach { (idTeam, team) ->
+                            val eventList = response.value.events.filter { event ->
+                                (idTeam == event.idAwayTeam || idTeam == event.idHomeTeam) && event.dateEvent == date.toString()
+                            }
+                            if (eventList.isNotEmpty() && !events.containsKey(team.strLeague)) events[eventList[0].strLeague?: ""] = eventList.sortedBy { it.strTimestamp }
                         }
                     }
                     is Resource.Loading -> {
-                        Log.d("SAMBA", "LOADING")
+                        Log.d("getEventsByDate", "LOADING")
                     }
                     is Resource.Error -> {
                         onError(error = Throwable(response.error))
@@ -89,6 +100,14 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
+    private fun onDocumentTeamsEvent(wasDocumentDeleted: Boolean, team: StorageTeam) {
+        if (wasDocumentDeleted) {
+            favoriteTeamsFromStorage.remove(team.idTeam)
+        } else {
+            favoriteTeamsFromStorage[team.idTeam] = team
+        }
+    }
+
     fun getTeamBadge(idTeam : String?) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getTeamBadge(idTeam?:"").collect(){
@@ -97,14 +116,31 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
+    fun getTeamBadgeFromApi(teamName : String) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getTeamBadgeFromApi(teamName).collect{ response ->
+                when (response) {
+                    is Resource.Success -> {
+                        teamBadge[response.value.teams[0].idTeam] = response.value.teams[0].strTeamBadge.toString()
+                    }
+                }
+            }
+        }
+    }
+
     fun getFinalOrDateText(event : Event) : String {
         val offSet = getTimeZoneOffsetWithUTCInHours()
         var textToeventFinishOrTime = "Final"
-        Log.d("SAMBA1", "STATUS : ${event.strStatus}")
         if (event.strStatus.equals("NS", ignoreCase = true) ||
             event.strStatus.equals("Not Started", ignoreCase = true) ||
             event.strStatus.isNullOrEmpty()) {
             textToeventFinishOrTime = LocalTime.parse(event.strTime).plusHours(offSet).toString()
+        }
+        if (event.strPostponed.equals("si", ignoreCase = true) ||
+            event.strPostponed.equals("yes", ignoreCase = true) ||
+            event.strPostponed.equals("y", ignoreCase = true)) {
+            textToeventFinishOrTime = "Postponed"
         }
         return textToeventFinishOrTime
     }

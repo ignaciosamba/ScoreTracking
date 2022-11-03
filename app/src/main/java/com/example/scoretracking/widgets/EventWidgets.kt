@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,11 +23,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.example.scoretracking.R
 import com.example.scoretracking.model.Event
-import com.example.scoretracking.screen.main.GameScreenViewModel
+import com.example.scoretracking.screen.main.MainScreenViewModel
 
 @Composable
 fun GameEventCard(event : Event,
-                  viewModel : GameScreenViewModel,
+                  viewModel : MainScreenViewModel,
                   onClick: (String) ->  Unit) {
     Card(
         modifier = Modifier
@@ -85,8 +84,8 @@ fun GameEventCard(event : Event,
 
 @Composable
 fun MotorSportEventCard(event : Event,
-                  viewModel : GameScreenViewModel,
-                  onClick: (String) ->  Unit) {
+                        viewModel : MainScreenViewModel,
+                        onClick: (String) ->  Unit) {
     Card(modifier = Modifier
         .padding(bottom = 15.dp, end = 10.dp, start = 10.dp)
         .fillMaxWidth()
@@ -147,7 +146,7 @@ fun MotorSportEventCard(event : Event,
 fun ItemTeam(
     teamName : String?,
     teamId: String?,
-    viewModel: GameScreenViewModel
+    viewModel: MainScreenViewModel
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -158,6 +157,9 @@ fun ItemTeam(
                 .width(75.dp)
                 .height(75.dp)
                 .background(color = Color.Transparent, shape = CircleShape)) {
+            if (viewModel.teamBadge[teamId].isNullOrEmpty()) {
+                viewModel.getTeamBadgeFromApi(teamName = teamName!!)
+            }
             Image(
                 painter = rememberImagePainter("${viewModel.teamBadge[teamId]}/preview"),
                 contentDescription = "Team logo",
