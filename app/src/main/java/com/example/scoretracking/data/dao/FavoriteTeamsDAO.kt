@@ -1,8 +1,7 @@
 package com.example.scoretracking.data.dao
 
 import androidx.room.*
-import com.example.scoretracking.model.LeagueFavorite
-import com.example.scoretracking.model.TeamsFavorite
+import com.example.scoretracking.model.localroommodels.TeamsFavorite
 import kotlinx.coroutines.flow.Flow
 
 

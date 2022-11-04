@@ -1,14 +1,12 @@
 package com.example.scoretracking.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.scoretracking.model.Country
+import com.example.scoretracking.model.thesportdbmodels.Country
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Country is the class whit all the information of one league.

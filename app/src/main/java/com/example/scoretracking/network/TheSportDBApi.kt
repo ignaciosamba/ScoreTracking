@@ -1,6 +1,9 @@
 package com.example.scoretracking.network
 
-import com.example.scoretracking.model.*
+import com.example.scoretracking.model.thesportdbmodels.GameEventsModel
+import com.example.scoretracking.model.thesportdbmodels.LeagueStandingModel
+import com.example.scoretracking.model.thesportdbmodels.LeaguesModel
+import com.example.scoretracking.model.thesportdbmodels.TeamsModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

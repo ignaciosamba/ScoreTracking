@@ -7,10 +7,10 @@ import com.example.scoretracking.data.dao.FavoriteLeagesDAO
 import com.example.scoretracking.data.dao.FavoriteTeamsDAO
 import com.example.scoretracking.data.dao.LeagueDAO
 import com.example.scoretracking.data.dao.TeamsDAO
-import com.example.scoretracking.model.service.AccountInterface
+import com.example.scoretracking.network.ESPN_SPORT_API_BASE_URL
+import com.example.scoretracking.network.EspnApi
 import com.example.scoretracking.network.SPORT_API_BASE_URL
 import com.example.scoretracking.network.TheSportDBApi
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +32,16 @@ class AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(TheSportDBApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesEspnApi() : EspnApi {
+        return Retrofit.Builder()
+            .baseUrl(ESPN_SPORT_API_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(EspnApi::class.java)
     }
 
     @Singleton

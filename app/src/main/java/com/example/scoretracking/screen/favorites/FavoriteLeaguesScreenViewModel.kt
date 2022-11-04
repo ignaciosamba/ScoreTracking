@@ -3,11 +3,11 @@ package com.example.scoretracking.screen.favorites
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.viewModelScope
-import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.StorageLeague
-import com.example.scoretracking.model.service.AccountInterface
-import com.example.scoretracking.model.service.LogInterface
-import com.example.scoretracking.model.service.StorageLeagueInterface
+import com.example.scoretracking.model.thesportdbmodels.Country
+import com.example.scoretracking.model.firebasemodels.StorageLeague
+import com.example.scoretracking.model.services.AccountInterface
+import com.example.scoretracking.model.services.LogInterface
+import com.example.scoretracking.model.services.StorageLeagueInterface
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.leagues.LeagueRepository
 import com.example.scoretracking.screen.LoginBasicViewModel

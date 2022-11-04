@@ -3,8 +3,8 @@ package com.example.scoretracking.screen.splash
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.service.AccountInterface
+import com.example.scoretracking.model.thesportdbmodels.Country
+import com.example.scoretracking.model.services.AccountInterface
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.repository.Resource
 import com.example.scoretracking.repository.leagues.LeagueRepository

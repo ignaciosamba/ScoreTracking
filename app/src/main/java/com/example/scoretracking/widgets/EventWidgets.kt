@@ -1,6 +1,5 @@
 package com.example.scoretracking.widgets
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.example.scoretracking.R
-import com.example.scoretracking.model.Event
+import com.example.scoretracking.model.thesportdbmodels.Event
 import com.example.scoretracking.screen.main.MainScreenViewModel
 
 @Composable
@@ -47,7 +46,7 @@ fun GameEventCard(event : Event,
             verticalAlignment = Alignment.CenterVertically
         ) {
             viewModel.getTeamBadge(event.idHomeTeam)
-            Spacer(modifier = Modifier.width(15.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             ItemTeam(event.strHomeTeam, event.idHomeTeam, viewModel)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
@@ -154,8 +153,8 @@ fun ItemTeam(
         modifier = Modifier.padding(bottom = 10.dp, top = 10.dp)) {
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
-                .width(75.dp)
-                .height(75.dp)
+                .width(55.dp)
+                .height(55.dp)
                 .background(color = Color.Transparent, shape = CircleShape)) {
             if (viewModel.teamBadge[teamId].isNullOrEmpty()) {
                 viewModel.getTeamBadgeFromApi(teamName = teamName!!)
@@ -164,15 +163,15 @@ fun ItemTeam(
                 painter = rememberImagePainter("${viewModel.teamBadge[teamId]}/preview"),
                 contentDescription = "Team logo",
                 modifier = Modifier
-                    .height(65.dp)
-                    .width(65.dp)
+                    .height(50.dp)
+                    .width(50.dp)
                     .align(Alignment.TopCenter)
             )
         }
         Box(contentAlignment = Alignment.TopCenter,
             modifier = Modifier
                 .wrapContentHeight()
-                .width(85.dp)) {
+                .width(65.dp)) {
             Text(text = teamName.toString(), fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }

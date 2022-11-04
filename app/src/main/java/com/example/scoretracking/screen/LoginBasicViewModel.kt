@@ -3,7 +3,7 @@ package com.example.scoretracking.screen
 import androidx.lifecycle.ViewModel
 import com.example.scoretracking.commons.snackbar.SnackBarManager
 import com.example.scoretracking.commons.snackbar.SnackbarMessage.Companion.toSnackbarMessage
-import com.example.scoretracking.model.service.LogInterface
+import com.example.scoretracking.model.services.LogInterface
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 open class LoginBasicViewModel (private val logService: LogInterface) : ViewModel() {

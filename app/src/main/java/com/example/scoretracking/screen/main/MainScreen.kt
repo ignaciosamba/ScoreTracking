@@ -51,7 +51,7 @@ fun GamesScreen(
 
         Log.d("SAMBA", "Selected: $bottomNavSelected")
         if(bottomNavSelected.equals("Games", ignoreCase = true)) {
-            viewModel.getEventsByDate()
+//            viewModel.getEventsByDate()
             GameScreen(
                 modifier = Modifier.padding(innerPadding),
                 openScreen = openScreen,
@@ -61,7 +61,11 @@ fun GamesScreen(
             )
         } else if (bottomNavSelected.equals("Standings", ignoreCase = true)) {
             Log.d("SAMBA", "favoriteLeaguesFromStorage: ${viewModel.favoriteLeaguesFromStorage}")
-            StandingScreen(openScreen = openScreen, modifier = modifier, viewModel = viewModel)
+            StandingScreen(
+                openScreen = openScreen,
+                modifier = modifier.padding(innerPadding),
+                viewModel = viewModel
+            )
         }
     }
 }

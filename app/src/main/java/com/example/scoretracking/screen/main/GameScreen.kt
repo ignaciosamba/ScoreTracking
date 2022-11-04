@@ -27,7 +27,7 @@ import com.example.scoretracking.R
 import com.example.scoretracking.commons.displayText
 import com.example.scoretracking.commons.getWeekPageTitle
 import com.example.scoretracking.commons.rememberFirstVisibleWeekAfterScroll
-import com.example.scoretracking.model.Event
+import com.example.scoretracking.model.thesportdbmodels.Event
 import com.example.scoretracking.widgets.GameEventCard
 import com.example.scoretracking.widgets.MotorSportEventCard
 import com.kizitonwose.calendar.compose.WeekCalendar

@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.scoretracking.model.StorageLeague
+import com.example.scoretracking.model.firebasemodels.StorageLeague
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.LeagueFavoriteClicableItem
 

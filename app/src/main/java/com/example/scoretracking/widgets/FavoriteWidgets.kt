@@ -20,16 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.example.scoretracking.R.drawable as AppDrawable
-import com.example.scoretracking.model.Country
-import com.example.scoretracking.model.StorageLeague
-import com.example.scoretracking.model.Team
+import com.example.scoretracking.model.thesportdbmodels.Country
+import com.example.scoretracking.model.firebasemodels.StorageLeague
+import com.example.scoretracking.model.thesportdbmodels.Team
 import com.example.scoretracking.screen.favorites.FavoriteTeamsScreenViewModel
-import com.example.scoretracking.screen.main.MainScreenViewModel
 
 
 /*
@@ -37,11 +35,12 @@ import com.example.scoretracking.screen.main.MainScreenViewModel
  */
 @Composable
 fun LeagueItem(league : Country,
-                onClickAction: () -> Unit) {
+               onClickAction: () -> Unit) {
 
     Row(horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable {
+        modifier = Modifier
+            .clickable {
             onClickAction.invoke()
         }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -49,13 +48,17 @@ fun LeagueItem(league : Country,
                 contentDescription = "League logo",
                 modifier = Modifier
                     .padding(8.dp)
-                    .height(70.dp)
-                    .width(70.dp))
-            Column (modifier = Modifier.padding(end = 20.dp)){
+                    .height(60.dp)
+                    .width(60.dp))
+            Column (
+                modifier = Modifier
+                    .padding(end = 5.dp)
+                    .width(180.dp)){
                 Text(text = league.strLeague.toString(),
                     style = MaterialTheme.typography.subtitle1,
-                    fontSize = 15.sp,)
-                Text(text = league.strCountry.toString())
+                    fontSize = 13.sp,)
+                Text(text = league.strCountry.toString(),
+                    fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.weight(1f))
             AnimatedVisibility(visible = league.isFavorite,
@@ -114,10 +117,13 @@ fun LeagueFavoriteClicableItem(league : StorageLeague,
                     isClickedForIcon.value = false
                 }
             }) {
-            Column (modifier = Modifier.padding(end = 5.dp, start = 20.dp)){
+            Column (
+                modifier = Modifier
+                    .width(230.dp)
+                    .padding(end = 5.dp, start = 20.dp)){
                 Text(text = league.strLeague,
-                    style = MaterialTheme.typography.subtitle1,
-                    fontSize = 22.sp)
+                    style = MaterialTheme.typography.subtitle2,
+                    fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.weight(1f))
 
@@ -157,7 +163,7 @@ fun LeagueFavoriteClicableItem(league : StorageLeague,
  */
 @Composable
 fun TeamItem(team: Team,
-            onClickAction: (Team) -> Unit) {
+             onClickAction: (Team) -> Unit) {
         Row(horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -172,13 +178,18 @@ fun TeamItem(team: Team,
                         .height(45.dp)
                         .width(45.dp)
                 )
-                Column(modifier = Modifier.padding(end = 20.dp)) {
+                Column(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(end = 10.dp)) {
                     Text(
                         text = team.strTeam.toString(),
                         style = MaterialTheme.typography.subtitle1,
-                        fontSize = 15.sp
+                        fontSize = 13.sp
                     )
-                    Text(text = team.strCountry.toString())
+                    Text(
+                        text = team.strCountry.toString(),
+                        fontSize = 12.sp)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 AnimatedVisibility(
@@ -200,7 +211,8 @@ fun TeamItem(team: Team,
 
 
 @Composable
-fun TeamStandingTableItem(position : String,
+fun TeamStandingTableItem(modifier: Modifier,
+                          position : String,
                           teamName : String,
                           teamBadge : String,
                           teamGamesPlayed : String,
@@ -208,23 +220,23 @@ fun TeamStandingTableItem(position : String,
                           teamPts : String) {
     Row(verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 5.dp, start = 20.dp, end = 20.dp)
             .fillMaxWidth()
             .height(40.dp)) {
-        Box(contentAlignment = Alignment.CenterStart,
+        Box(contentAlignment = Alignment.Center,
             modifier = Modifier
-                .width(40.dp)
-                .padding(3.dp)) {
+                .width(25.dp)
+                .padding(start = 3.dp)) {
             Text(
                 text = position,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
         }
-        Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.width(2.dp))
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .height(30.dp)
@@ -241,37 +253,50 @@ fun TeamStandingTableItem(position : String,
         }
         Box(contentAlignment = Alignment.CenterStart,
             modifier = Modifier
-                .width(100.dp)) {
+                .width(if (teamGamesPlayed.isNotEmpty()) 100.dp else 150.dp)) {
             Text(
-                textAlign = TextAlign.Start,
                 text = teamName,
+                textAlign = TextAlign.Start,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 16.sp
             )
         }
         Spacer(modifier = Modifier.width(40.dp))
-        Box(contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .width(40.dp)) {
-            Text(
-                text = teamGamesPlayed,
-                fontStyle = FontStyle.Normal,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
+        if (teamGamesPlayed.isNotEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .width(35.dp)
+            ) {
+                Text(
+                    text = teamGamesPlayed,
+                    fontStyle = FontStyle.Normal,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
         }
-        Spacer(modifier = Modifier.width(5.dp))
-        Box(contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .width(40.dp)) {
-            Text(
-                text = teamDiff,
-                fontStyle = FontStyle.Normal,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
+        if (teamDiff.isNotEmpty()) {
+            Spacer(modifier = Modifier.width(5.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .width(35.dp)
+            ) {
+                Text(
+                    text = teamDiff,
+                    fontStyle = FontStyle.Normal,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
         }
+
         Spacer(modifier = Modifier.width(5.dp))
         Box(contentAlignment = Alignment.CenterEnd,
             modifier = Modifier
@@ -279,7 +304,7 @@ fun TeamStandingTableItem(position : String,
             Text(
                 text = teamPts,
                 fontStyle = FontStyle.Normal,
-                fontSize = 16.sp,
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center
             )
         }

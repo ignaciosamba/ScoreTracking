@@ -1,15 +1,14 @@
 package com.example.scoretracking.screen.login
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.commons.isValidEmail
 import com.example.scoretracking.commons.isValidPassword
 import com.example.scoretracking.commons.passwordMatches
 import com.example.scoretracking.commons.snackbar.SnackBarManager
-import com.example.scoretracking.model.RegisterUiState
-import com.example.scoretracking.model.service.AccountInterface
-import com.example.scoretracking.model.service.LogInterface
+import com.example.scoretracking.model.login.RegisterUiState
+import com.example.scoretracking.model.services.AccountInterface
+import com.example.scoretracking.model.services.LogInterface
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.screen.LoginBasicViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

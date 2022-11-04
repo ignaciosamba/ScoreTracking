@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scoretracking.R
-import com.example.scoretracking.model.Country
+import com.example.scoretracking.model.thesportdbmodels.Country
 import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.BottomNavFavoritesApp
 import com.example.scoretracking.widgets.LeagueItem

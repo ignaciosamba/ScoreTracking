@@ -1,6 +1,6 @@
 package com.example.scoretracking.di
 
-import com.example.scoretracking.model.service.*
+import com.example.scoretracking.model.services.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
