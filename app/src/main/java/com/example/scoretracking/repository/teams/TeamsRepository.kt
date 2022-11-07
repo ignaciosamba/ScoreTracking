@@ -5,6 +5,7 @@ import com.example.scoretracking.data.dao.FavoriteTeamsDAO
 import com.example.scoretracking.data.dao.TeamsDAO
 import com.example.scoretracking.model.localroommodels.LeagueFavorite
 import com.example.scoretracking.model.localroommodels.TeamsFavorite
+import com.example.scoretracking.model.thesportdbmodels.Team
 import com.example.scoretracking.network.performGetResources
 import com.example.scoretracking.repository.RemoteDataSourceTheSportDB
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +34,10 @@ class TeamsRepository  @Inject constructor(
         } else {
             leagueFavoriteLocalDataSource.deleteFavoriteTeam(team)
         }
+    }
+
+    suspend fun saveTeamIntoDB(team : Team) {
+        leagueLocalDataSource.instertTeam(team)
     }
 
     fun getFavoriteLeagues() : Flow<List<LeagueFavorite>>{

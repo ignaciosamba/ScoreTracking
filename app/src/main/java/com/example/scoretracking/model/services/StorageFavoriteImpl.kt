@@ -36,6 +36,29 @@ class StorageFavoriteImpl @Inject constructor()
         }
     }
 
+    override fun addLeagueListenerCompleted(
+        userId: String,
+        onDocumentEvent: (Boolean, StorageLeague) -> Unit,
+        onError: (Throwable) -> Unit,
+        onComlete: () -> Unit
+    ) {
+        val query = Firebase.firestore.collection(LEAGUE_COLLECTION).whereEqualTo(USER_ID, userId)
+
+        listenerRegistration = query.addSnapshotListener { value, error ->
+            if (error != null) {
+                onError(error)
+                return@addSnapshotListener
+            }
+
+            value?.documentChanges?.forEach {
+                val wasDocumentDeleted = it.type == DocumentChange.Type.REMOVED
+                val task = it.document.toObject<StorageLeague>().copy(idLeague = it.document.toObject<StorageLeague>().idLeague)
+                onDocumentEvent(wasDocumentDeleted, task)
+            }
+            onComlete()
+        }
+    }
+
     override fun removeLeagueListener() {
         listenerRegistration?.remove()
     }

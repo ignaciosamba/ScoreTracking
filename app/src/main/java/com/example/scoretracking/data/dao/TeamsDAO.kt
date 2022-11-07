@@ -18,5 +18,8 @@ interface TeamsDAO {
     fun getTeamBadge(idTeam : String) : Flow<String>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun instertTeam(teams : Team)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun instertAll(teams : List<Team>)
 }

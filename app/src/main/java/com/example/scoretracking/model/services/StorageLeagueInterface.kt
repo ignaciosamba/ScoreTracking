@@ -9,6 +9,13 @@ interface StorageLeagueInterface {
         onError: (Throwable) -> Unit
     )
 
+    fun addLeagueListenerCompleted(
+        userId: String,
+        onDocumentEvent: (Boolean, StorageLeague) -> Unit,
+        onError: (Throwable) -> Unit,
+        onComlete: () -> Unit
+    )
+
     fun removeLeagueListener()
     fun getFavoriteLeague(leagueId: String, onError: (Throwable) -> Unit, onSuccess: (StorageLeague) -> Unit)
     fun saveFavoriteLeague(league: StorageLeague, onResult: (Throwable?) -> Unit)

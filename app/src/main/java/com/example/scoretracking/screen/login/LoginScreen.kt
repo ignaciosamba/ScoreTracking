@@ -1,30 +1,43 @@
 package com.example.scoretracking.screen.login
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.scoretracking.commons.basicButton
 import com.example.scoretracking.commons.fieldModifier
 import com.example.scoretracking.commons.textButton
 import com.example.scoretracking.commons.textButtonEnd
+import com.example.scoretracking.navigation.SportTrackerScreens
 import com.example.scoretracking.widgets.BasicButton
 import com.example.scoretracking.widgets.BasicTextButton
 import com.example.scoretracking.widgets.EmailField
 import com.example.scoretracking.widgets.PasswordField
+import kotlinx.coroutines.delay
 import com.example.scoretracking.R.string as AppText
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(openAndPopUp: (String, String) -> Unit,
                 openScreen: (String) -> Unit,
                 viewModel: LoginScreenViewModel = hiltViewModel()) {
+
+    DisposableEffect(viewModel) {
+        onDispose { viewModel.removeListener() }
+    }
+
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
 
     val uiState by viewModel.uiState
 
@@ -47,6 +60,7 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit,
             }
         }
         BasicButton(AppText.login, Modifier.basicButton()) {
+            keyboard?.hide()
             viewModel.onSignInClick(openAndPopUp)
         }
 

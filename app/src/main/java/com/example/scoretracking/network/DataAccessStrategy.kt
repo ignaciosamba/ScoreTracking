@@ -1,8 +1,12 @@
 package com.example.scoretracking.network
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import com.example.scoretracking.repository.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import okhttp3.internal.wait
 
 fun<T,A> performGetResources(databaseQuery : () -> Flow<T>,
                              networkCall : suspend () -> Resource<A>,

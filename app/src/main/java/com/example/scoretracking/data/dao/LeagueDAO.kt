@@ -1,5 +1,6 @@
 package com.example.scoretracking.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -21,6 +22,9 @@ interface LeagueDAO {
 
     @Query("SELECT * FROM leagues WHERE strSport =:strSport")
     fun getAllLeaguesBySport(strSport : String) : Flow<List<Country>>
+
+    @Query("SELECT * FROM leagues WHERE strSport =:strSport")
+    fun getAllLeaguesBySport1(strSport : String) : LiveData<List<Country>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun instertAll(leagues : List<Country>)

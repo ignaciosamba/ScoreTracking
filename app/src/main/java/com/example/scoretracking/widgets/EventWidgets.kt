@@ -1,5 +1,6 @@
 package com.example.scoretracking.widgets
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -157,6 +158,7 @@ fun ItemTeam(
                 .height(55.dp)
                 .background(color = Color.Transparent, shape = CircleShape)) {
             if (viewModel.teamBadge[teamId].isNullOrEmpty()) {
+                Log.d("SAMBA", "CALLING TE API FOR BADGE")
                 viewModel.getTeamBadgeFromApi(teamName = teamName!!)
             }
             Image(
