@@ -25,6 +25,7 @@ import com.example.scoretracking.screen.favorites.FavoritesTeamsSelection
 import com.example.scoretracking.screen.login.LoginScreen
 import com.example.scoretracking.screen.login.RegisterScreen
 import com.example.scoretracking.screen.main.GamesScreen
+import com.example.scoretracking.screen.settings.SettingsScreen
 import com.example.scoretracking.ui.theme.ScoreTrackingTheme
 import kotlinx.coroutines.CoroutineScope
 
@@ -89,8 +90,8 @@ fun NavGraphBuilder.makeItSoGraph(appState: ScoreTrackingAppState) {
         SportTrackerSplashScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
     }
 
-    composable(SportTrackerScreens.SelectFavoritesLeaguesScreen.name) {
-        FavoritesSelection(openScreen = { route -> appState.navigate(route) })
+    composable("${SportTrackerScreens.SelectFavoritesLeaguesScreen.name}/{from}") { backEntry ->
+        FavoritesSelection(openScreen = { route -> appState.navigate(route) }, backEntry.arguments?.getString("from"))
     }
 
     composable(SportTrackerScreens.SelectFavoritesTeamsScreen.name) {
@@ -111,14 +112,9 @@ fun NavGraphBuilder.makeItSoGraph(appState: ScoreTrackingAppState) {
     composable(SportTrackerScreens.GamesScreen.name) {
         GamesScreen(openScreen = { route -> appState.navigate(route) })
     }
-//
-//    composable(
-//        route = "$EDIT_TASK_SCREEN$TASK_ID_ARG",
-//        arguments = listOf(navArgument(TASK_ID) { defaultValue = TASK_DEFAULT_ID })
-//    ) {
-//        EditTaskScreen(
-//            popUpScreen = { appState.popUp() },
-//            taskId = it.arguments?.getString(TASK_ID) ?: TASK_DEFAULT_ID
-//        )
-//    }
+    composable(SportTrackerScreens.SettingsScreen.name) {
+        SettingsScreen(
+            openScreen = { route -> appState.navigate(route)},
+            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+    }
 }

@@ -158,7 +158,6 @@ fun ItemTeam(
                 .height(55.dp)
                 .background(color = Color.Transparent, shape = CircleShape)) {
             if (viewModel.teamBadge[teamId].isNullOrEmpty()) {
-                Log.d("SAMBA", "CALLING TE API FOR BADGE")
                 viewModel.getTeamBadgeFromApi(teamName = teamName!!)
             }
             Image(

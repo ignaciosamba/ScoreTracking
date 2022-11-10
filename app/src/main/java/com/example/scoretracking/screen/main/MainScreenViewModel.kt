@@ -1,8 +1,6 @@
 package com.example.scoretracking.screen.main
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
@@ -40,7 +38,10 @@ class MainScreenViewModel @Inject constructor(
 ) : LoginBasicViewModel(logService) {
 
     // This map is for all the events.
-    var events = mutableStateMapOf<String, List<Event>>()
+    var events = mutableStateMapOf<String, ArrayList<Event>>()
+        private set
+    // This map is for all the events.
+    var eventsFiltered = mutableStateMapOf<String, ArrayList<Event>>()
         private set
     // This map is for all the teams icons.
     var teamBadge = mutableStateMapOf<String, String>()
@@ -51,7 +52,6 @@ class MainScreenViewModel @Inject constructor(
     // This list is for all the favorite leagues
     private var favoriteTeamsFromStorage = mutableStateMapOf<String, StorageTeam>()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     var selectedDay = mutableStateOf<LocalDate>(LocalDate.now())
         private set
 
@@ -78,29 +78,69 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getEventsByDate(date : LocalDate = LocalDate.now()) {
-        viewModelScope.launch(showErrorExceptionHandler) {
-            repository.getEventsByDay(date.toString()).collect { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        favoriteLeaguesFromStorage.forEach { (idLeague, league) ->
-                            val eventList = response.value.events.filter { event ->
-                                idLeague == event.idLeague && event.dateEvent == date.toString()
+        var leagueHasEvents = false
+        events.forEach { (league, eventList) ->
+            eventList.forEach { event ->
+                if (event.dateEvent == date.toString()) {
+                    leagueHasEvents = true
+                }
+
+            }
+        }
+        if (!leagueHasEvents) {
+            viewModelScope.launch(showErrorExceptionHandler) {
+                repository.getEventsByDay(date.toString()).collect { response ->
+                    when (response) {
+                        is Resource.Success -> {
+                            favoriteLeaguesFromStorage.forEach { (idLeague, league) ->
+                                val eventList = response.value.events.filter { event ->
+                                    idLeague == event.idLeague && event.dateEvent == date.toString()
+                                }
+
+                                if (eventList.isNotEmpty()) {
+                                    events[league.strLeague] = events[league.strLeague]?: ArrayList()
+                                    events[league.strLeague]!!.addAll(
+                                        eventList.sortedBy { it.strTimestamp })
+                                    eventsFiltered[league.strLeague] = eventsFiltered[league.strLeague]?: ArrayList()
+                                    eventsFiltered[league.strLeague]!!.addAll(
+                                        eventList.sortedBy { it.strTimestamp })
+                                }
                             }
-                            if (eventList.isNotEmpty()) events[league.strLeague] = eventList.sortedBy { it.strTimestamp }
-                        }
-                        favoriteTeamsFromStorage.forEach { (idTeam, team) ->
-                            val eventList = response.value.events.filter { event ->
-                                (idTeam == event.idAwayTeam || idTeam == event.idHomeTeam) && event.dateEvent == date.toString()
+                            favoriteTeamsFromStorage.forEach { (idTeam, team) ->
+                                val eventList = response.value.events.filter { event ->
+                                    (idTeam == event.idAwayTeam || idTeam == event.idHomeTeam) && event.dateEvent == date.toString()
+                                }
+                                if (eventList.isNotEmpty() && !events.containsKey(team.strLeague)) {
+                                    events[eventList[0].strLeague?: ""] = events[eventList[0].strLeague?: ""]?: ArrayList()
+                                    events[eventList[0].strLeague
+                                        ?: ""]?.addAll(eventList.sortedBy { it.strTimestamp })
+                                    eventsFiltered[eventList[0].strLeague?: ""] = eventsFiltered[eventList[0].strLeague?: ""]?: ArrayList()
+                                    eventsFiltered[eventList[0].strLeague
+                                        ?: ""]?.addAll(eventList.sortedBy { it.strTimestamp })
+                                }
                             }
-                            if (eventList.isNotEmpty() && !events.containsKey(team.strLeague)) events[eventList[0].strLeague?: ""] = eventList.sortedBy { it.strTimestamp }
+                        }
+                        is Resource.Loading -> {
+                            Log.d("getEventsByDate", "LOADING")
+                        }
+                        is Resource.Error -> {
+                            onError(error = Throwable(response.error))
                         }
                     }
-                    is Resource.Loading -> {
-                        Log.d("getEventsByDate", "LOADING")
+                }
+            }
+        } else {
+            events.forEach { (league, eventList) ->
+                var eventListForDate = ArrayList<Event>()
+                eventList.forEach { event ->
+                    if (event.dateEvent == date.toString()) {
+                        eventListForDate.add(event)
                     }
-                    is Resource.Error -> {
-                        onError(error = Throwable(response.error))
-                    }
+                }
+                if (eventList.isNotEmpty()) {
+                    eventsFiltered[league] = eventListForDate
+                } else {
+                    eventsFiltered.remove(league)
                 }
             }
         }
@@ -151,10 +191,10 @@ class MainScreenViewModel @Inject constructor(
                             standings[leagueId] = convertFromEspnNbaApiToGenericStanding(response.value)
                         }
                         is Resource.Loading -> {
-                            Log.d("SAMBA5", "LOADING")
+                            Log.d("getStandingNBAEspn", "LOADING")
                         }
                         is Resource.Error -> {
-                            Log.d("SAMBA5", "ERROR : ${response.error}")
+                            onError(Throwable(response.error))
                         }
                     }
                 }
@@ -165,10 +205,10 @@ class MainScreenViewModel @Inject constructor(
                         standings[leagueId] = convertFromEspnF1ApiToGenericStanding(response.value)
                     }
                     is Resource.Loading -> {
-                        Log.d("SAMBA5", "LOADING")
+                        Log.d("getStandingF1Espn", "LOADING")
                     }
                     is Resource.Error -> {
-                        Log.d("SAMBA5", "ERROR : ${response.error}")
+                        onError(Throwable(response.error))
                     }
                 }
             }
@@ -176,14 +216,13 @@ class MainScreenViewModel @Inject constructor(
                 repository.getStandingByLeague(leagueId, season).collect{ response ->
                     when (response) {
                         is Resource.Success -> {
-                            //TODO call a converter.
                             standings[leagueId] = convertFromTheSportDBToGenericStanding(response.value)
                         }
                         is Resource.Loading -> {
-                            Log.d("SAMBA5", "LOADING")
+                            Log.d("getStandingByLeague", "LOADING")
                         }
                         is Resource.Error -> {
-                            Log.d("SAMBA5", "ERROR : ${response.error}")
+                            onError(Throwable(response.error))
                         }
                     }
                 }

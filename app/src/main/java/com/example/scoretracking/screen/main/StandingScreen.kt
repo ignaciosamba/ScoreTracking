@@ -36,15 +36,12 @@ fun StandingScreen(
 
     val filteredEvent = viewModel.standings
 
-    Log.d("SAMBA", "favoriteLeaguesFromStorage: ${viewModel.favoriteLeaguesFromStorage}")
-
     Column(
         modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (viewModel.favoriteLeaguesFromStorage.isNotEmpty()) {
-            Log.d("SAMBA", "favoriteLeaguesFromStorage: ${viewModel.favoriteLeaguesFromStorage}")
             var leagues = ArrayList<StorageLeague>()
             viewModel.favoriteLeaguesFromStorage.forEach {
                 leagues.add(it.value)
@@ -69,7 +66,6 @@ fun StandingScreen(
 fun CompileLeagueList(leagues : List<StorageLeague>,
                       viewModel: MainScreenViewModel
 ) {
-    Log.d("SAMBA", "COMPILELEAGUELIST WITH $leagues")
 
     leagues.forEach { league ->
         // This is used for the teams lists.
@@ -126,7 +122,6 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                 isClickedForIcon.value = true
                 if (league.idLeague.equals(NBA_LEAGUE_ID, ignoreCase = true)) {
                     val filteredList = viewModel.standings[league.idLeague]?.sortedBy { it.position.toInt() }?.groupBy { it.division }
-                    Log.d("SAMBA5", "CLICKED AND LOADING LAZY")
                     LazyColumn(contentPadding = PaddingValues(4.dp)) {
                         filteredList?.forEach { (division, standingModelList) ->
                             stickyHeader {
@@ -157,7 +152,6 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                     val filteredList =
                         viewModel.standings[league.idLeague]?.sortedBy { it.position.toInt() }
                             ?.groupBy { it.division }
-                    Log.d("SAMBA5", "CLICKED AND LOADING LAZY")
                     LazyColumn(contentPadding = PaddingValues(4.dp)) {
                         filteredList?.forEach { (division, standingModelList) ->
                             stickyHeader {
@@ -185,7 +179,6 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                         }
                     }
                 } else {
-                    Log.d("SAMBA5", "CLICKED AND LOADING LAZY")
                     LazyColumn(contentPadding = PaddingValues(4.dp)) {
                         stickyHeader {
                             TeamStandingTableItem(

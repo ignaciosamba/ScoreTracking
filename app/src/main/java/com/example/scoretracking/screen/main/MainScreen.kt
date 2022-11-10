@@ -4,10 +4,16 @@ import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.scoretracking.navigation.SportTrackerScreens
+import com.example.scoretracking.screen.favorites.TopAppBarActionButton
 import com.example.scoretracking.widgets.BottomNavMainApp
 import java.time.LocalDate
 import com.example.scoretracking.R.color as AppColor
@@ -40,7 +46,15 @@ fun GamesScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = bottomNavSelected) },
-                backgroundColor = colorResource(id = AppColor.white)
+                backgroundColor = colorResource(id = AppColor.white),
+                actions = {
+                    // SEARCH button
+                    TopAppBarActionButton(
+                        imageVector = Icons.Default.Settings,
+                        description = "Settings") {
+                        openScreen(SportTrackerScreens.SettingsScreen.name)
+                    }
+                },
             )
         },
         bottomBar = {
@@ -49,9 +63,7 @@ fun GamesScreen(
             }
         }) { innerPadding ->
 
-        Log.d("SAMBA", "Selected: $bottomNavSelected")
         if(bottomNavSelected.equals("Games", ignoreCase = true)) {
-//            viewModel.getEventsByDate()
             GameScreen(
                 modifier = Modifier.padding(innerPadding),
                 openScreen = openScreen,
@@ -60,7 +72,6 @@ fun GamesScreen(
                 endDate = endDate
             )
         } else if (bottomNavSelected.equals("Standings", ignoreCase = true)) {
-            Log.d("SAMBA", "favoriteLeaguesFromStorage: ${viewModel.favoriteLeaguesFromStorage}")
             StandingScreen(
                 openScreen = openScreen,
                 modifier = modifier.padding(innerPadding),

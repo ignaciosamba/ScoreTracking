@@ -64,7 +64,7 @@ class RegisterScreenViewModel @Inject constructor(
             accountInt.registerNewAccoun(email, password) { error ->
 //                createAccountTrace.stop()
                 if (error == null) {
-                    openAndPopUp(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.RegisterScreen.name)
+                    openAndPopUp("${SportTrackerScreens.SelectFavoritesLeaguesScreen.name}/Login", SportTrackerScreens.RegisterScreen.name)
                 } else {
                     onError(error)
                 }

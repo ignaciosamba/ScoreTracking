@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -41,6 +43,14 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit,
 
     val uiState by viewModel.uiState
 
+    val loginClicked = remember {
+        viewModel.clicked
+    }
+
+    if (loginClicked.value) {
+        LoginAlert()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,15 +71,25 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit,
         }
         BasicButton(AppText.login, Modifier.basicButton()) {
             keyboard?.hide()
+            loginClicked.value = false
             viewModel.onSignInClick(openAndPopUp)
         }
-
-        BasicTextButton(AppText.login_register, Modifier.textButton(), 16.sp, MaterialTheme.colors.primary) {
+        BasicTextButton(AppText.login_register, Modifier.textButton(), 16.sp, Color.Black) {
             viewModel.onCreateAccountClicked(openScreen)
         }
 
+
     }
 
+}
+
+@Composable
+fun LoginAlert () {
+    AlertDialog(onDismissRequest = {},
+        text = {
+            Text(text = "Login In...", fontSize = 17.sp)
+        },
+        buttons = {})
 }
 
 

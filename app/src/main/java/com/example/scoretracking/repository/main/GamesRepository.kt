@@ -43,9 +43,7 @@ class GamesRepository @Inject constructor(
     suspend fun getStandingByLeague(leagueId : String, season : String) : Flow<Resource<LeagueStandingModel>> =
         flow<Resource<LeagueStandingModel>> {
             emit(Resource.Loading(true))
-            Log.d("SAMBA5", "CALLING WITH $leagueId")
             val response = leaguesTheSportDBRemoteDataSource.getStandingByLeague(leagueId, season)
-            Log.d("SAMBA5", "RESPONSE $response")
             emit(response)
         }
 
@@ -53,7 +51,6 @@ class GamesRepository @Inject constructor(
         flow<Resource<NbaEspnStandingModel>> {
             emit(Resource.Loading(true))
             val response = leaguesEspnRemoteDataSource.getNBAStandings()
-            Log.d("SAMBA5", "RESPONSE $response")
             emit(response)
         }
 
@@ -61,7 +58,6 @@ class GamesRepository @Inject constructor(
         flow<Resource<Formula1EspnStanding>> {
             emit(Resource.Loading(true))
             val response = leaguesEspnRemoteDataSource.getF1Standings()
-            Log.d("SAMBA5", "RESPONSE $response")
             emit(response)
         }
 }

@@ -40,6 +40,9 @@ class LoginScreenViewModel @Inject constructor(
     private val accountService: AccountInterface
 ): LoginBasicViewModel(loginInt){
 
+    var clicked = mutableStateOf(false)
+        private set
+
     var uiState = mutableStateOf(LoginUiState())
         private set
 
@@ -54,7 +57,6 @@ class LoginScreenViewModel @Inject constructor(
 
     fun addListener() {
         viewModelScope.launch(showErrorExceptionHandler) {
-            Log.d("SAMBA2", "ADDLISTENER")
             storageLeagueInterface.addLeagueListenerCompleted(accountService.getUserId(), ::onDocumentLeagueEvent, ::onError, ::onComlete)
         }
     }
@@ -74,6 +76,7 @@ class LoginScreenViewModel @Inject constructor(
     }
 
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
+
         if (!email.isValidEmail()) {
             SnackBarManager.showMessage(AppText.email_error)
             return
@@ -85,11 +88,13 @@ class LoginScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch(showErrorExceptionHandler) {
+            clicked.value = true
             accountInt.authenticate(email, password) { error ->
                 if (error == null) {
                     lmbd = openAndPopUp
                     addListener()
                 } else {
+                    clicked.value = false
                     onError(error)
                 }
             }
@@ -98,7 +103,6 @@ class LoginScreenViewModel @Inject constructor(
 
     private fun getFavoritesTeamsToRoom() {
         viewModelScope.launch {
-            Log.d("SAMBA3", "launch ${favoriteLeaguesFromStorage.size}")
             favoriteLeaguesFromStorage.map {
                 async { repository.getTeamsByLeagueId(it.value.idLeague).collect() { league ->
                     when(league) {
@@ -107,7 +111,7 @@ class LoginScreenViewModel @Inject constructor(
                 } }.await()
             }
             if(favoriteLeaguesFromStorage.isEmpty()) {
-                lmbd?.let { it(SportTrackerScreens.SelectFavoritesLeaguesScreen.name, SportTrackerScreens.LoginScreen.name) }
+                lmbd?.let { it("${SportTrackerScreens.SelectFavoritesLeaguesScreen.name}/login", SportTrackerScreens.LoginScreen.name) }
             } else {
                 lmbd?.let { it(SportTrackerScreens.GamesScreen.name, SportTrackerScreens.LoginScreen.name) }
             }

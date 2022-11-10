@@ -46,7 +46,9 @@ fun GameScreen(
     endDate : LocalDate/*,
     selection : LocalDate,*/
 ) {
-    val filteredEvent = viewModel.events
+//    val filteredEvent = viewModel.events
+
+    val filteredEvent = viewModel.eventsFiltered
 
     var selection1 = viewModel.selectedDay
 
@@ -107,7 +109,8 @@ fun GameScreen(
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     filteredEvent.forEach { (league, gameList) ->
                         stickyHeader {
-                            StickyGameLeague(league)
+                            if (gameList.isNotEmpty())
+                                StickyGameLeague(league)
                         }
                         items(items = gameList) { item ->
                             GameItem(item, viewModel) { eventId ->

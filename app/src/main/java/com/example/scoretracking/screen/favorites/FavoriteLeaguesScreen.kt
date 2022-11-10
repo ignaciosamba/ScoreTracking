@@ -2,6 +2,7 @@ package com.example.scoretracking.screen.favorites
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +46,7 @@ import java.util.*
 @Composable
 fun FavoritesSelection(
     openScreen: (String) -> Unit,
+    fromScreen: String?,
     modifier: Modifier = Modifier,
     viewModel: FavoriteLeaguesScreenViewModel = hiltViewModel()
 ) {
@@ -86,14 +88,16 @@ fun FavoritesSelection(
 
     val activity = (LocalContext.current as? Activity)
 
-    BackHandler {
+    BackHandler (enabled = fromScreen.equals("splash", ignoreCase = true) ||
+            fromScreen.equals("login", ignoreCase = true)) {
         if (searchClicked) {
             searchClicked = false
             text = ""
             filterList.value = emptyList()
             focusRequester.requestFocus()
             keyboard?.hide()
-        } else {
+        } else if (fromScreen.equals("splash", ignoreCase = true) ||
+            fromScreen.equals("login", ignoreCase = true)) {
             activity?.finish()
         }
     }
@@ -112,13 +116,16 @@ fun FavoritesSelection(
                         searchClicked = true
                     }
                     // GO icon
-                    TopAppBarActionButton(
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        description = "GoToFavoriteTeams"
-                    ) {
-                        viewModel.cleanLeaguesList()
-                        filterList.value = emptyList()
-                        openScreen(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
+                    if (fromScreen.equals("splash", ignoreCase = true) ||
+                        fromScreen.equals("login", ignoreCase = true)) {
+                        TopAppBarActionButton(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            description = "GoToFavoriteTeams"
+                        ) {
+                            viewModel.cleanLeaguesList()
+                            filterList.value = emptyList()
+                            openScreen(SportTrackerScreens.SelectFavoritesTeamsScreen.name)
+                        }
                     }
                 },
                 contentColor = Color.Black,
@@ -141,7 +148,7 @@ fun FavoritesSelection(
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier
                         .height(50.dp)
-                        .background(colorResource(id = R.color.purple_500))
+                        .background(colorResource(id = R.color.white))
                         .fillMaxWidth()
                         .padding(top = 5.dp)
                 ) {
@@ -149,6 +156,7 @@ fun FavoritesSelection(
                             .width(300.dp)
                             .height(40.dp),
                             shape = CircleShape,
+                            border = BorderStroke(width = 1.dp, color = Color.Transparent),
                             backgroundColor = Color.White) {
                             BasicTextField(value = text,
                                 onValueChange = {

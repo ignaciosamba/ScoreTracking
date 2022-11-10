@@ -59,6 +59,7 @@ class SplashScreenViewModel @Inject constructor(
 
     fun onAppStart(openAndPopUp : (String, String) -> Unit) {
         if (account.hasUser()) {
+            //TODO we need to check if the user has favorites, if not we need to open the favorite Screen.
             openAndPopUp(
                 SportTrackerScreens.GamesScreen.name,
                 SportTrackerScreens.SplashScreen.name
