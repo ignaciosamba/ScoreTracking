@@ -21,6 +21,9 @@ interface TheSportDBApi {
     @GET("v1/json/$API_KEY/lookup_all_teams.php")
     suspend fun getTeamsByLeagueId(@Query("id") leagueId : String?): Response<TeamsModel>
 
+    @GET("v1/json/$API_KEY/search_all_teams.php")
+    suspend fun getTeamsByLeagueName(@Query("l") leagueName : String?): Response<TeamsModel>
+
     @GET("v1/json/$API_KEY/eventsday.php")
     suspend fun getEventsByDate(@Query("d") date : String?): Response<GameEventsModel>
 

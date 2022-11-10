@@ -19,9 +19,9 @@ class TeamsRepository  @Inject constructor(
     private val leagueFavoriteLeagueDataSource: FavoriteLeagesDAO
 ) {
 
-    fun getTeamsByLeagueId(leagueId : String) = performGetResources (
+    fun getTeamsByLeagueId(leagueName : String, leagueId : String) = performGetResources (
         databaseQuery = { leagueLocalDataSource.getAllTeamsByLeagueId(leagueId).distinctUntilChanged() },
-        networkCall =  { leaguesRemoteDataSource.getTeamsByLeagueId(leagueId) },
+        networkCall =  { leaguesRemoteDataSource.getTeamsByLeagueName(leagueName) },
         saveCallResult = { leagueLocalDataSource.instertAll(it.teams)})
 
     fun getFavoritesTeams() : Flow<List<TeamsFavorite>> {

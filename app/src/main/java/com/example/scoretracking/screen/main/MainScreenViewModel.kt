@@ -236,7 +236,8 @@ class MainScreenViewModel @Inject constructor(
         if (event.strStatus.equals("NS", ignoreCase = true) ||
             event.strStatus.equals("Not Started", ignoreCase = true) ||
             event.strStatus.isNullOrEmpty()) {
-            textToeventFinishOrTime = LocalTime.parse(event.strTime).plusHours(offSet).toString()
+            textToeventFinishOrTime = if (!event.strStatus.isNullOrEmpty())
+                LocalTime.parse(event.strTime).plusHours(offSet).toString() else  ""
         }
         if (event.strPostponed.equals("si", ignoreCase = true) ||
             event.strPostponed.equals("yes", ignoreCase = true) ||

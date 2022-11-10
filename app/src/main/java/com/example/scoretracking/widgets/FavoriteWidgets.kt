@@ -112,7 +112,7 @@ fun LeagueFavoriteClicableItem(league : StorageLeague,
                 teamsOfLeague = mutableStateListOf()
                 isClicked.value = !isClicked.value
                 if (isClicked.value) {
-                    viewModel.getTeamsByLeague(league.idLeague)
+                    viewModel.getTeamsByLeague(league.strLeague, league.idLeague)
                 } else {
                     isClickedForIcon.value = false
                 }

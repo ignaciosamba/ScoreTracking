@@ -104,7 +104,7 @@ class LoginScreenViewModel @Inject constructor(
     private fun getFavoritesTeamsToRoom() {
         viewModelScope.launch {
             favoriteLeaguesFromStorage.map {
-                async { repository.getTeamsByLeagueId(it.value.idLeague).collect() { league ->
+                async { repository.getTeamsByLeagueId(it.value.strLeague, it.value.idLeague).collect() { league ->
                     when(league) {
                         is Resource.Success -> Log.d("getTeamsByLeagueId", "league ${it.value.idLeague} size ${league.value.size}")
                     }

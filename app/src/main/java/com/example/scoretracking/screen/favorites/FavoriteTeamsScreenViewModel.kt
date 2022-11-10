@@ -55,9 +55,9 @@ class FavoriteTeamsScreenViewModel @Inject constructor(
         }
     }
 
-    fun getTeamsByLeague(leagueId : String) {
+    fun getTeamsByLeague(leagueName : String, leagueId : String) {
         viewModelScope.launch(showErrorExceptionHandler){
-            repository.getTeamsByLeagueId(leagueId).distinctUntilChanged().collectLatest { response ->
+            repository.getTeamsByLeagueId(leagueName, leagueId).distinctUntilChanged().collectLatest { response ->
                 when (response) {
                     is Resource.Success -> {
                         // This if it's a workaround for the leagues without teams in it.
