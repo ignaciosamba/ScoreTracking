@@ -46,6 +46,9 @@ fun GameEventCard(event : Event,
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (!event.strStatus.isNullOrEmpty() && event.strStatus!!.contains("H")) {
+                viewModel.getLivesEventsFromSport(event.strSport?: "")
+            }
             viewModel.getTeamBadge(event.idHomeTeam)
             Spacer(modifier = Modifier.width(10.dp))
             ItemTeam(event.strHomeTeam, event.idHomeTeam, viewModel)
@@ -54,21 +57,21 @@ fun GameEventCard(event : Event,
                 text = event.intHomeScore ?: "",
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
+                fontSize = 20.sp
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = viewModel.getFinalOrDateText(event),
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 16.sp
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = event.intAwayScore ?: "",
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
+                fontSize = 20.sp
             )
             Spacer(modifier = Modifier.width(10.dp))
             viewModel.getTeamBadge(event.idAwayTeam)
@@ -172,7 +175,7 @@ fun ItemTeam(
         Box(contentAlignment = Alignment.TopCenter,
             modifier = Modifier
                 .wrapContentHeight()
-                .width(65.dp)) {
+                .width(70.dp)) {
             Text(text = teamName.toString(), fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }

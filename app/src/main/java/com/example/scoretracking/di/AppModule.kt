@@ -7,15 +7,16 @@ import com.example.scoretracking.data.dao.FavoriteLeagesDAO
 import com.example.scoretracking.data.dao.FavoriteTeamsDAO
 import com.example.scoretracking.data.dao.LeagueDAO
 import com.example.scoretracking.data.dao.TeamsDAO
-import com.example.scoretracking.network.ESPN_SPORT_API_BASE_URL
-import com.example.scoretracking.network.EspnApi
-import com.example.scoretracking.network.SPORT_API_BASE_URL
-import com.example.scoretracking.network.TheSportDBApi
+import com.example.scoretracking.model.services.LogInterface
+import com.example.scoretracking.network.*
+import com.example.scoretracking.repository.RemoteDataSourceTheSportDB
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -73,6 +74,4 @@ class AppModule {
     @Provides
     fun provideFavoriteTeamDao(theSportDataBase: TheSportDataBase) : FavoriteTeamsDAO =
         theSportDataBase.favoriteTeamsDao()
-
-
 }

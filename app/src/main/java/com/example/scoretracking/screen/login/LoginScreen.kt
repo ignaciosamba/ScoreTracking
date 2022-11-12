@@ -87,7 +87,7 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit,
 fun LoginAlert () {
     AlertDialog(onDismissRequest = {},
         text = {
-            Text(text = "Login In...", fontSize = 17.sp)
+            Text(text = "Log In...", fontSize = 17.sp)
         },
         buttons = {})
 }

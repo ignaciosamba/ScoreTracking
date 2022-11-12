@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.commons.getTimeZoneOffsetWithUTCInHours
+import com.example.scoretracking.commons.snackbar.SnackBarManager
+import com.example.scoretracking.commons.snackbar.SnackbarMessage.Companion.toSnackbarMessage
 import com.example.scoretracking.model.StandingGenericModel
 import com.example.scoretracking.model.espnmodels.formula1.Formula1EspnStanding
 import com.example.scoretracking.model.espnmodels.nba.NbaEspnStandingModel
@@ -42,6 +44,10 @@ class MainScreenViewModel @Inject constructor(
         private set
     // This map is for all the events.
     var eventsFiltered = mutableStateMapOf<String, ArrayList<Event>>()
+        private set
+
+    // This map is for all the events.
+    var eventsFiltered1 = mutableStateMapOf<String, ArrayList<Event>>()
         private set
     // This map is for all the teams icons.
     var teamBadge = mutableStateMapOf<String, String>()
@@ -139,6 +145,7 @@ class MainScreenViewModel @Inject constructor(
                 }
                 if (eventList.isNotEmpty()) {
                     eventsFiltered[league] = eventListForDate
+
                 } else {
                     eventsFiltered.remove(league)
                 }
@@ -244,6 +251,11 @@ class MainScreenViewModel @Inject constructor(
             event.strPostponed.equals("y", ignoreCase = true)) {
             textToeventFinishOrTime = "Postponed"
         }
+        if (event.strStatus != null &&
+            (event.strStatus.toString().contains("H")  ||
+                    !event.strProgress.isNullOrEmpty())) {
+            textToeventFinishOrTime = event.strProgress?: "On going"
+        }
         return textToeventFinishOrTime
     }
 
@@ -317,6 +329,57 @@ class MainScreenViewModel @Inject constructor(
             }
         }
         return standingGenericStanding
+    }
+
+    fun getLivesEventsFromSport(sportType : String) {
+        viewModelScope.launch {
+            repository.getEventLiveBySport(sportType).collect{ gamesLiveEvents ->
+                when(gamesLiveEvents) {
+                    is Resource.Success -> {
+                        if(!gamesLiveEvents.value.events.isNullOrEmpty())
+                            covertLiveEvent(gamesLiveEvents.value.events)
+                    }
+                    is Resource.Error -> {
+                        onError(Throwable(gamesLiveEvents.error))
+                    }
+                    is Resource.Loading -> {
+                        Log.d("getStandingByLeague", "LOADING")
+                    }
+                }
+            }
+        }
+    }
+
+    fun covertLiveEvent(gamesLiveEvents : List<Event>) {
+        gamesLiveEvents.filter { event ->
+            var foundEvent = false
+            eventsFiltered.values.forEach { eventsList ->
+                eventsList.forEach{
+                    if (event.idEvent.equals(it.idEvent) && event.dateEvent == LocalDate.now().toString())
+                        foundEvent = true
+                }
+            }
+            foundEvent
+        }
+
+        gamesLiveEvents.forEach { liveEvents ->
+            eventsFiltered.forEach { (league, eventList)->
+                val listUpdated = ArrayList<Event>()
+                eventList.forEach { event ->
+                    if( event.idEvent == liveEvents.idEvent) {
+                        event.intAwayScore = liveEvents.intAwayScore
+                        event.intHomeScore = liveEvents.intHomeScore
+                        event.strProgress = "${liveEvents.strProgress}'"
+                    }
+                    listUpdated.add(event)
+                }
+                eventsFiltered1[league] = listUpdated
+            }
+        }
+        eventsFiltered1.forEach { (league, liveEventsList) ->
+            eventsFiltered.remove(league)
+            eventsFiltered[league] = liveEventsList
+        }
     }
 
 }
