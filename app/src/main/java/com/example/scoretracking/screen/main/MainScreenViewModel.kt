@@ -130,7 +130,7 @@ class MainScreenViewModel @Inject constructor(
                             Log.d("getEventsByDate", "LOADING")
                         }
                         is Resource.Error -> {
-                            onError(error = Throwable(response.error))
+                            onError(error = Throwable("${ response.error } getEventsByDate"))
                         }
                     }
                 }
@@ -251,10 +251,15 @@ class MainScreenViewModel @Inject constructor(
             event.strPostponed.equals("y", ignoreCase = true)) {
             textToeventFinishOrTime = "Postponed"
         }
-        if (event.strStatus != null &&
-            (event.strStatus.toString().contains("H")  ||
+        if ((event.strStatus != null &&
+            (event.strStatus.toString().contains("H") ) ||
                     !event.strProgress.isNullOrEmpty())) {
-            textToeventFinishOrTime = event.strProgress?: "On going"
+            Log.d("SAMBA", "TEAM;: ${event.idHomeTeam} and ${event.strProgress} and ${event.strStatus}")
+            textToeventFinishOrTime = event.strProgress?:
+            (if(!event.strStatus.equals("NS", ignoreCase = true) ||
+                !event.strStatus.equals("Not Started", ignoreCase = true))
+                "Final" else LocalTime.parse(event.strTime).plusHours(offSet).toString())
+
         }
         return textToeventFinishOrTime
     }
@@ -340,7 +345,7 @@ class MainScreenViewModel @Inject constructor(
                             covertLiveEvent(gamesLiveEvents.value.events)
                     }
                     is Resource.Error -> {
-                        onError(Throwable(gamesLiveEvents.error))
+                        onError(Throwable("${gamesLiveEvents.error} getLivesEventsFromSport"))
                     }
                     is Resource.Loading -> {
                         Log.d("getStandingByLeague", "LOADING")
@@ -370,7 +375,9 @@ class MainScreenViewModel @Inject constructor(
                         event.intAwayScore = liveEvents.intAwayScore
                         event.intHomeScore = liveEvents.intHomeScore
                         event.strProgress = "${liveEvents.strProgress}'"
-                    }
+                    } /*else {
+                        event.strProgress = ""
+                    }*/
                     listUpdated.add(event)
                 }
                 eventsFiltered1[league] = listUpdated
