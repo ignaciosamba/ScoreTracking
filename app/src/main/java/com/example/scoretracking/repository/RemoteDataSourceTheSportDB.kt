@@ -35,4 +35,16 @@ class RemoteDataSourceTheSportDB @Inject constructor(
     suspend fun getStandingByLeague(leagueId : String, season : String) = getResults {
         sportDBApi.getStandingByLeague(leagueId, season)
     }
+
+    suspend fun getStatisticsByEventId(eventId : String) = getResults {
+        sportDBApi.getStatisticsByEventId(eventId)
+    }
+
+    suspend fun getLineupByEventId(eventId : String) = getResults {
+        sportDBApi.getLineupByEventId(eventId)
+    }
+
+    suspend fun getTimelineByEventId(eventId : String) = getResults {
+        sportDBApi.getTimelineByEventId(eventId)
+    }
 }

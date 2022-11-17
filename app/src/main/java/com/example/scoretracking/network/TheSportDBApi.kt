@@ -1,9 +1,6 @@
 package com.example.scoretracking.network
 
-import com.example.scoretracking.model.thesportdbmodels.GameEventsModel
-import com.example.scoretracking.model.thesportdbmodels.LeagueStandingModel
-import com.example.scoretracking.model.thesportdbmodels.LeaguesModel
-import com.example.scoretracking.model.thesportdbmodels.TeamsModel
+import com.example.scoretracking.model.thesportdbmodels.*
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -36,4 +33,12 @@ interface TheSportDBApi {
     @GET("v2/json/$API_KEY//livescore.php")
     suspend fun getLiveEventsBySport(@Query("s") sport : String?): Response<GameEventsModel>
 
+    @GET("v1/json/$API_KEY/lookupeventstats.php")
+    suspend fun getStatisticsByEventId(@Query("id") season: String): Response<EventStatisticsDetails>
+
+    @GET("v1/json/$API_KEY/lookuplineup.php")
+    suspend fun getLineupByEventId(@Query("id") season: String): Response<LineupEventDetails>
+
+    @GET("v1/json/$API_KEY/lookuptimeline.php")
+    suspend fun getTimelineByEventId(@Query("id") season: String): Response<TimelineEventDetails>
 }

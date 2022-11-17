@@ -5,9 +5,7 @@ import com.example.scoretracking.data.dao.LeagueDAO
 import com.example.scoretracking.data.dao.TeamsDAO
 import com.example.scoretracking.model.espnmodels.formula1.Formula1EspnStanding
 import com.example.scoretracking.model.espnmodels.nba.NbaEspnStandingModel
-import com.example.scoretracking.model.thesportdbmodels.GameEventsModel
-import com.example.scoretracking.model.thesportdbmodels.LeagueStandingModel
-import com.example.scoretracking.model.thesportdbmodels.TeamsModel
+import com.example.scoretracking.model.thesportdbmodels.*
 import com.example.scoretracking.network.LiveEventPoller
 import com.example.scoretracking.network.Poller
 import com.example.scoretracking.repository.RemoteDataSourceEspn
@@ -69,4 +67,26 @@ class GamesRepository @Inject constructor(
 
     fun getEventLiveBySport(sportType : String) : Flow<Resource<GameEventsModel>> =
         liveEventPoller.poll(1000, sportType)
+
+    suspend fun getStatisticsByEventId(eventId : String) : Flow<Resource<EventStatisticsDetails>> =
+        flow<Resource<EventStatisticsDetails>> {
+            emit(Resource.Loading(true))
+            val response = leaguesTheSportDBRemoteDataSource.getStatisticsByEventId(eventId)
+            emit(response)
+        }
+
+    suspend fun getLineupByEventId(eventId : String) : Flow<Resource<LineupEventDetails>> =
+        flow<Resource<LineupEventDetails>> {
+            emit(Resource.Loading(true))
+            val response = leaguesTheSportDBRemoteDataSource.getLineupByEventId(eventId)
+            emit(response)
+        }
+
+    suspend fun getTimelineByEventId(eventId : String) : Flow<Resource<TimelineEventDetails>> =
+        flow<Resource<TimelineEventDetails>> {
+            emit(Resource.Loading(true))
+            val response = leaguesTheSportDBRemoteDataSource.getTimelineByEventId(eventId)
+            emit(response)
+        }
+
 }

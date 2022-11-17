@@ -1,0 +1,20 @@
+package com.example.scoretracking.model.thesportdbmodels
+
+data class TimelineItem(val strTimeline: String = "",
+                        val strPlayer: String = "",
+                        val strTeam: String = "",
+                        val idEvent: String = "",
+                        val strComment: String = "",
+                        val strEvent: String = "",
+                        val idTeam: String = "",
+                        val idTimeline: String = "",
+                        val intTime: String = "",
+                        val dateEvent: String = "",
+                        val strTimelineDetail: String = "",
+                        val idPlayer: String = "",
+                        val strCountry: String?,
+                        val strHome: String = "",
+                        val strAssist: String = "",
+                        val idAssist: String?,
+                        val idAPIfootball: String = "",
+                        val strSeason: String = "")

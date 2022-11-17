@@ -25,13 +25,6 @@ class LiveEventPoller @Inject constructor(
             while (!isClosedForSend) {
                 delay(delay)
                 val data = leaguesTheSportDBRemoteDataSource.getLiveEventsBySport(sportType)
-//                when (data) {
-//                    is Resource.Success -> send(data)
-//                    is Resource.Error -> {
-//                        SnackBarManager.showMessage(Throwable(data.error).toSnackbarMessage())
-//                        logService.logNonFatalCrash(Throwable(data.error))
-//                    }
-//                }
                 send(data)
             }
         }.flowOn(dispatcher)
