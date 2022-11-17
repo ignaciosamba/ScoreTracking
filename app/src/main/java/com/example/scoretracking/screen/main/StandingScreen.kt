@@ -3,12 +3,12 @@ package com.example.scoretracking.screen.main
 import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +38,8 @@ fun StandingScreen(
     val filteredEvent = viewModel.standings
 
     Column(
-        modifier.fillMaxSize(),
+        modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -66,63 +68,39 @@ fun StandingScreen(
 fun CompileLeagueList(leagues : List<StorageLeague>,
                       viewModel: MainScreenViewModel
 ) {
+        val leagueSelected = remember {
+            mutableStateOf<StorageLeague>(
+                StorageLeague("",
+                "",
+                "",
+                "",
+                "",
+                "")
+            )
+        }
 
-    leagues.forEach { league ->
-        // This is used for the teams lists.
-        val isClicked = remember {
+        val wasOpen = remember {
             mutableStateOf(false)
         }
-        // This is used only for the icons.
-        val isClickedForIcon = remember {
-            mutableStateOf(false)
-        }
 
-        Row(horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(bottom = 15.dp, top = 5.dp)
-                .clickable {
-                    isClicked.value = !isClicked.value
-                    if (isClicked.value) {
+        LazyColumn(
+            contentPadding = PaddingValues(4.dp)
+        ) {
+            leagues.forEach { league ->
+                stickyHeader {
+                    LeagueClickedItem(league = league) { league, opened ->
                         viewModel.getStandingByLeague(league.idLeague, league.strCurrentSeason)
-                    } else {
-                        isClickedForIcon.value = false
+                        wasOpen.value = opened
+                        leagueSelected.value = league
                     }
-                }) {
-                Box(contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .padding(start = 20.dp)) {
-                    Text(
-                        text = league.strLeague,
-                        style = MaterialTheme.typography.subtitle1,
-                        fontSize = 19.sp
-                    )
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Crossfade(targetState = isClickedForIcon.value,
-                    animationSpec = tween(100)
-                ) { isChecked ->
-                    Icon(imageVector = if(isChecked) Icons.Default.KeyboardArrowUp
-                                else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "arrow to open",
-                        modifier = Modifier
-                            .height(48.dp)
-                            .width(48.dp)
-                            .padding(end = 15.dp))
-                }
-        }
-
-        Box(modifier = Modifier.fillMaxWidth()) {
-            if (isClicked.value && !viewModel.standings[league.idLeague].isNullOrEmpty()) {
-                isClickedForIcon.value = true
-                if (league.idLeague.equals(NBA_LEAGUE_ID, ignoreCase = true)) {
-                    val filteredList = viewModel.standings[league.idLeague]?.sortedBy { it.position.toInt() }?.groupBy { it.division }
-                    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+                if (wasOpen.value &&
+                    league.idLeague == leagueSelected.value.idLeague &&
+                    !viewModel.standings[leagueSelected.value.idLeague].isNullOrEmpty()) {
+                    if (leagueSelected.value.idLeague.equals(NBA_LEAGUE_ID, ignoreCase = true)) {
+                        val filteredList = viewModel.standings[leagueSelected.value.idLeague]
+                            ?.sortedBy { it.position.toInt() }
+                            ?.groupBy { it.division }
                         filteredList?.forEach { (division, standingModelList) ->
                             stickyHeader {
                                 TeamStandingTableItem(
@@ -135,7 +113,7 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                                     teamPts = "PCT"
                                 )
                             }
-                            items(items = standingModelList) { item ->
+                            itemsIndexed(items = standingModelList) { index, item ->
                                 TeamStandingTableItem(
                                     modifier = Modifier.background(Color.Transparent),
                                     position = item.position,
@@ -147,12 +125,11 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                                 )
                             }
                         }
-                    }
-                } else if (league.idLeague.equals(F1_LEAGUE_ID, ignoreCase = true)) {
-                    val filteredList =
-                        viewModel.standings[league.idLeague]?.sortedBy { it.position.toInt() }
-                            ?.groupBy { it.division }
-                    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+                    } else if (leagueSelected.value.idLeague.equals(F1_LEAGUE_ID, ignoreCase = true)) {
+                        val filteredList =
+                            viewModel.standings[leagueSelected.value.idLeague]
+                                ?.sortedBy { it.position.toInt() }
+                                ?.groupBy { it.division }
                         filteredList?.forEach { (division, standingModelList) ->
                             stickyHeader {
                                 TeamStandingTableItem(
@@ -165,7 +142,7 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                                     teamPts = "PTS"
                                 )
                             }
-                            items(items = standingModelList) { item ->
+                            itemsIndexed(items = standingModelList) { index, item ->
                                 TeamStandingTableItem(
                                     modifier = Modifier.background(Color.Transparent),
                                     position = item.position,           // position
@@ -177,9 +154,7 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                                 )
                             }
                         }
-                    }
-                } else {
-                    LazyColumn(contentPadding = PaddingValues(4.dp)) {
+                    } else {
                         stickyHeader {
                             TeamStandingTableItem(
                                 modifier = Modifier.background(Color.White),
@@ -191,7 +166,7 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                                 teamPts = "PTS"           // tercera columna
                             )
                         }
-                        items(items = viewModel.standings[league.idLeague]!!) { item ->
+                        items(items = viewModel.standings[leagueSelected.value.idLeague]!!) { item ->
                             TeamStandingTableItem(
                                 modifier = Modifier.background(Color.Transparent),
                                 position = item.position,           // position
@@ -205,8 +180,54 @@ fun CompileLeagueList(leagues : List<StorageLeague>,
                     }
                 }
             }
+    }
+}
+
+@Composable
+fun LeagueClickedItem(
+    league : StorageLeague,
+    onClick : (StorageLeague, Boolean) -> Unit) {
+    val isClicked = remember {
+        mutableStateOf(false)
+    }
+    // This is used only for the icons.
+    val isClickedForIcon = remember {
+        mutableStateOf(false)
+    }
+    Row(horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .padding(bottom = 15.dp, top = 5.dp)
+            .clickable {
+                isClicked.value = !isClicked.value
+                isClickedForIcon.value = isClicked.value
+                onClick(league, isClicked.value)
+            }) {
+        Box(contentAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .height(40.dp)
+                .padding(start = 20.dp)) {
+            Text(
+                text = league.strLeague,
+                style = MaterialTheme.typography.subtitle1,
+                fontSize = 19.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Crossfade(targetState = isClickedForIcon.value,
+            animationSpec = tween(100)
+        ) { isChecked ->
+            Icon(imageVector = if(isChecked) Icons.Default.KeyboardArrowUp
+            else Icons.Default.KeyboardArrowDown,
+                contentDescription = "arrow to open",
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
+                    .padding(end = 15.dp))
         }
     }
-
-
 }

@@ -383,9 +383,16 @@ class MainScreenViewModel @Inject constructor(
                 eventsFiltered1[league] = listUpdated
             }
         }
+        var listToDelete = ArrayList<Event>()
         eventsFiltered1.forEach { (league, liveEventsList) ->
+            //TODO delete only the events of the date.
+            eventsFiltered.forEach { (league, events) ->
+                listToDelete.addAll(events.filterNot { liveEventsList.contains(it) })
+            }
+            eventsFiltered[league]?.removeAll(listToDelete)
             eventsFiltered.remove(league)
-            eventsFiltered[league] = liveEventsList
+            // TODO add only the event of the date selected.
+            eventsFiltered[league]?.addAll(liveEventsList)
         }
     }
 
