@@ -266,7 +266,11 @@ class MainScreenViewModel @Inject constructor(
                 textToeventFinishOrTime = (if (event.strStatus.equals("HT", ignoreCase = true)) {
                     "Half time"
                 } else if(event.strStatus.toString().equals("1H", ignoreCase = true) ||
-                    event.strStatus.toString().equals("2H", ignoreCase = true)) {
+                    event.strStatus.toString().equals("2H", ignoreCase = true) &&
+                    (LocalTime.now().isAfter(LocalTime.parse(event.strTime).plusHours(offSet)) &&
+                            LocalTime.now().isBefore(LocalTime.parse(event.strTime)
+                                .plusHours(offSet+1).plusMinutes(45))) &&
+                        event.strProgress.isNullOrEmpty()) {
                     "Live"
                 } else if (!event.strStatus.equals("NS", ignoreCase = true) ||
                     !event.strStatus.equals("Not Started", ignoreCase = true)
@@ -280,6 +284,8 @@ class MainScreenViewModel @Inject constructor(
                     event.strStatus.toString().equals("2H", ignoreCase = true))){
             textToeventFinishOrTime = "Live"
         }
+        Log.d("SAMBA5", "NOW ${event.strHomeTeam} ${LocalTime.parse(event.strTime).plusHours(offSet+1)
+            .plusMinutes(45)}")
         return textToeventFinishOrTime
     }
 
@@ -402,7 +408,7 @@ class MainScreenViewModel @Inject constructor(
                         event.intHomeScore = liveEvents.intHomeScore
                         event.strProgress = "${liveEvents.strProgress}'"
                     } else if (event.strStatus == "90") {
-                        event.strStatus = ""
+                        event.strStatus = "FT"
                     }
                     listUpdated.add(event)
                 }
