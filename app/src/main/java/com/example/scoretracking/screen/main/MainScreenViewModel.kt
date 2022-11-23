@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.scoretracking.commons.getTimeZoneOffsetWithUTCInHours
-import com.example.scoretracking.commons.snackbar.SnackBarManager
-import com.example.scoretracking.commons.snackbar.SnackbarMessage.Companion.toSnackbarMessage
 import com.example.scoretracking.model.StandingGenericModel
 import com.example.scoretracking.model.espnmodels.formula1.Formula1EspnStanding
 import com.example.scoretracking.model.espnmodels.nba.NbaEspnStandingModel
@@ -25,6 +23,7 @@ import com.example.scoretracking.repository.main.GamesRepository
 import com.example.scoretracking.screen.LoginBasicViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -65,6 +64,12 @@ class MainScreenViewModel @Inject constructor(
     var standings = mutableStateMapOf<String, List<StandingGenericModel>>()
         private set
 
+    private var job = Job()
+        get() {
+            if (field.isCancelled) field = Job()
+            return field
+        }
+
     init {
         getEventsByDate()
     }
@@ -85,7 +90,7 @@ class MainScreenViewModel @Inject constructor(
 
     fun getEventsByDate(date : LocalDate = LocalDate.now()) {
         var leagueHasEvents = false
-        events.forEach { (league, eventList) ->
+        events.forEach { (_, eventList) ->
             eventList.forEach { event ->
                 if (event.dateEvent == date.toString()) {
                     leagueHasEvents = true
@@ -190,6 +195,7 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getStandingByLeague(leagueId : String, season : String) {
+
         viewModelScope.launch(Dispatchers.IO) {
             if (leagueId.equals(NBA_LEAGUE_ID, ignoreCase = true)) {
                 repository.getStandingNBAEspn().collect { response ->
@@ -245,21 +251,34 @@ class MainScreenViewModel @Inject constructor(
             event.strStatus.isNullOrEmpty()) {
             textToeventFinishOrTime = if (!event.strStatus.isNullOrEmpty())
                 LocalTime.parse(event.strTime).plusHours(offSet).toString() else  ""
-        }
-        if (event.strPostponed.equals("si", ignoreCase = true) ||
+        } else if (event.strPostponed.equals("si", ignoreCase = true) ||
             event.strPostponed.equals("yes", ignoreCase = true) ||
             event.strPostponed.equals("y", ignoreCase = true)) {
             textToeventFinishOrTime = "Postponed"
-        }
-        if ((event.strStatus != null &&
-            (event.strStatus.toString().contains("H") ) ||
-                    !event.strProgress.isNullOrEmpty())) {
-            Log.d("SAMBA", "TEAM;: ${event.idHomeTeam} and ${event.strProgress} and ${event.strStatus}")
-            textToeventFinishOrTime = event.strProgress?:
-            (if(!event.strStatus.equals("NS", ignoreCase = true) ||
-                !event.strStatus.equals("Not Started", ignoreCase = true))
-                "Final" else LocalTime.parse(event.strTime).plusHours(offSet).toString())
-
+        } else if ((event.strStatus != null &&
+            event.strStatus.toString().contains("H") ) ||
+                    !event.strProgress.isNullOrEmpty()) {
+            if ((event.strStatus.toString().equals("1H", ignoreCase = true) ||
+                 event.strStatus.toString().equals("2H", ignoreCase = true)) &&
+                 !event.strProgress.isNullOrEmpty()) {
+                textToeventFinishOrTime = event.strProgress!!
+            } else {
+                textToeventFinishOrTime = (if (event.strStatus.equals("HT", ignoreCase = true)) {
+                    "Half time"
+                } else if(event.strStatus.toString().equals("1H", ignoreCase = true) ||
+                    event.strStatus.toString().equals("2H", ignoreCase = true)) {
+                    "Live"
+                } else if (!event.strStatus.equals("NS", ignoreCase = true) ||
+                    !event.strStatus.equals("Not Started", ignoreCase = true)
+                ) {
+                    "Final"
+                } else {
+                    LocalTime.parse(event.strTime).plusHours(offSet).toString()
+                })
+            }
+        } else if ((event.strStatus.toString().equals("1H", ignoreCase = true) ||
+                    event.strStatus.toString().equals("2H", ignoreCase = true))){
+            textToeventFinishOrTime = "Live"
         }
         return textToeventFinishOrTime
     }
@@ -337,11 +356,11 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun getLivesEventsFromSport(sportType : String) {
-        viewModelScope.launch {
-            repository.getEventLiveBySport(sportType).collect{ gamesLiveEvents ->
-                when(gamesLiveEvents) {
+        viewModelScope.launch(job) {
+            repository.getEventLiveBySport(sportType).collect { gamesLiveEvents ->
+                when (gamesLiveEvents) {
                     is Resource.Success -> {
-                        if(!gamesLiveEvents.value.events.isNullOrEmpty())
+                        if (!gamesLiveEvents.value.events.isNullOrEmpty())
                             covertLiveEvent(gamesLiveEvents.value.events)
                     }
                     is Resource.Error -> {
@@ -355,12 +374,19 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    fun deletePoller() {
+        job.cancel()
+        repository.deletePollerEventLiveBySport()
+    }
+
     fun covertLiveEvent(gamesLiveEvents : List<Event>) {
         gamesLiveEvents.filter { event ->
             var foundEvent = false
             eventsFiltered.values.forEach { eventsList ->
                 eventsList.forEach{
-                    if (event.idEvent.equals(it.idEvent) && event.dateEvent == LocalDate.now().toString())
+                    if (event.idEvent.equals(it.idEvent) &&
+                        event.dateEvent == selectedDay.value.toString() &&
+                        event.dateEvent == LocalDate.now().toString())
                         foundEvent = true
                 }
             }
@@ -375,25 +401,22 @@ class MainScreenViewModel @Inject constructor(
                         event.intAwayScore = liveEvents.intAwayScore
                         event.intHomeScore = liveEvents.intHomeScore
                         event.strProgress = "${liveEvents.strProgress}'"
-                    } /*else {
-                        event.strProgress = ""
-                    }*/
+                    } else if (event.strStatus == "90") {
+                        event.strStatus = ""
+                    }
                     listUpdated.add(event)
                 }
                 eventsFiltered1[league] = listUpdated
             }
         }
-        var listToDelete = ArrayList<Event>()
         eventsFiltered1.forEach { (league, liveEventsList) ->
-            //TODO delete only the events of the date.
-            eventsFiltered.forEach { (league, events) ->
-                listToDelete.addAll(events.filterNot { liveEventsList.contains(it) })
-            }
-            eventsFiltered[league]?.removeAll(listToDelete)
-            eventsFiltered.remove(league)
-            // TODO add only the event of the date selected.
-            eventsFiltered[league]?.addAll(liveEventsList)
+            eventsFiltered[league]?.clear()
+            var listToAddPoi = eventsFiltered[league]?: ArrayList()
+            liveEventsList.addAll(listToAddPoi)
+            eventsFiltered[league] = liveEventsList
         }
+        eventsFiltered1.clear()
     }
+
 
 }

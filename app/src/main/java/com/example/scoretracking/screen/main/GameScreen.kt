@@ -50,7 +50,7 @@ fun GameScreen(
 
     val filteredEvent = viewModel.eventsFiltered
 
-    var selection1 = viewModel.selectedDay
+    val selection1 = viewModel.selectedDay
 
     Column(
         modifier = modifier
@@ -94,6 +94,9 @@ fun GameScreen(
                             filteredEvent.clear()
                             selection1.value = clicked
                             viewModel.getEventsByDate(selection1.value)
+                            if(selection1.value.toString() != LocalDate.now().toString()) {
+                                viewModel.deletePoller()
+                            }
                         }
                     }
                 },

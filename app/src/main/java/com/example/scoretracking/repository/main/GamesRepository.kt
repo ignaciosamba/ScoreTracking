@@ -1,19 +1,13 @@
 package com.example.scoretracking.repository.main
 
-import android.util.Log
-import com.example.scoretracking.data.dao.LeagueDAO
 import com.example.scoretracking.data.dao.TeamsDAO
 import com.example.scoretracking.model.espnmodels.formula1.Formula1EspnStanding
 import com.example.scoretracking.model.espnmodels.nba.NbaEspnStandingModel
 import com.example.scoretracking.model.thesportdbmodels.*
 import com.example.scoretracking.network.LiveEventPoller
-import com.example.scoretracking.network.Poller
 import com.example.scoretracking.repository.RemoteDataSourceEspn
 import com.example.scoretracking.repository.RemoteDataSourceTheSportDB
 import com.example.scoretracking.repository.Resource
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
@@ -66,7 +60,10 @@ class GamesRepository @Inject constructor(
         }
 
     fun getEventLiveBySport(sportType : String) : Flow<Resource<GameEventsModel>> =
-        liveEventPoller.poll(1000, sportType)
+        liveEventPoller.poll(4000, sportType)
+
+    fun deletePollerEventLiveBySport() =
+        liveEventPoller.close()
 
     suspend fun getStatisticsByEventId(eventId : String) : Flow<Resource<EventStatisticsDetails>> =
         flow<Resource<EventStatisticsDetails>> {

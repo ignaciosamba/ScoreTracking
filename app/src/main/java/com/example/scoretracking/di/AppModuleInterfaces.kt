@@ -1,8 +1,6 @@
 package com.example.scoretracking.di
 
 import com.example.scoretracking.model.services.*
-import com.example.scoretracking.network.LiveEventPoller
-import com.example.scoretracking.network.Poller
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
